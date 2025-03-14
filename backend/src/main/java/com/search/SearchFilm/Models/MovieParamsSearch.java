@@ -18,12 +18,12 @@ public class MovieParamsSearch {
     private Integer releaseYearsEnd;
     private String ratingKp;
     private String ratingImdb;
-    private String ratingUs;
+    private String ratingOwn;
     private String ratingMpaa;
     private String ageRating;
     private String votesKp;
     private String votesImdb;
-    private String votesUs;
+    private String votesOwn;
     private String movieLength;
     private List<String> genres;
     private List<String> countries;
