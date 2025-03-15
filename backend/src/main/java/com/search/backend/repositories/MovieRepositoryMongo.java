@@ -1,4 +1,4 @@
-package com.search.backend.Repositories;
+package com.search.backend.repositories;
 
 import com.search.backend.models.MovieMongo;
 import org.springframework.data.mongodb.repository.MongoRepository;

@@ -1,10 +1,10 @@
-package com.search.backend.Controllers;
+package com.search.backend.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.backend.models.*;
-import com.search.backend.Repositories.MovieRepositoryMongo;
-import com.search.backend.Services.filmService;
+import com.search.backend.repositories.MovieRepositoryMongo;
+import com.search.backend.services.filmService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
