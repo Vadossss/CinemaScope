@@ -4,12 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.backend.models.Movie;
 import com.search.backend.models.MovieMongo;
 import com.search.backend.models.MovieParamsSearch;
-import com.search.backend.repositories.MovieRepository;
 import com.search.backend.repositories.MovieRepositoryMongo;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -26,34 +24,34 @@ import java.util.List;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 @Service
-public class filmService {
+public class FilmService {
 
     @Value("${KINO_API_KEY}")
     private String KINO_API_KEY;
 
     private final MongoTemplate mongoTemplate;
 
-    @Autowired
-    private MovieRepository movieRepository;
+//    @Autowired
+//    private MovieRepository movieRepository;
 
     private final MovieRepositoryMongo movieRepositoryMongo;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public filmService(MongoTemplate mongoTemplate, MovieRepositoryMongo movieRepositoryMongo) {
+    public FilmService(MongoTemplate mongoTemplate, MovieRepositoryMongo movieRepositoryMongo) {
         this.mongoTemplate = mongoTemplate;
         this.movieRepositoryMongo = movieRepositoryMongo;
     }
 
-    public void saveMovie(String json) {
-        try {
-            Movie movie = objectMapper.readValue(json, Movie.class);
-            movieRepository.save(movie);
-//            System.out.println("Фильм сохранен: " + movie.getName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    public void saveMovie(String json) {
+//        try {
+//            Movie movie = objectMapper.readValue(json, Movie.class);
+//            movieRepository.save(movie);
+////            System.out.println("Фильм сохранен: " + movie.getName());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public void updateMovieScore(long id, int score) {
         Query query = new Query(Criteria.where("_id").is(id));
@@ -85,7 +83,6 @@ public class filmService {
 
     public List<MovieMongo> findMoviesInRange(MovieParamsSearch movieParamsSearch) {
         Query query = new Query().limit(movieParamsSearch.getLimit());
-        Criteria criteria = new Criteria();
         if (movieParamsSearch.getReleaseYearsStart() != null && movieParamsSearch.getReleaseYearsEnd() != null) {
             query.addCriteria(Criteria.where("year").gte(movieParamsSearch.getReleaseYearsStart())
             .lte(movieParamsSearch.getReleaseYearsEnd()));
@@ -105,8 +102,18 @@ public class filmService {
         if (movieParamsSearch.getTypes() != null) {
             formatingMultipleParameters(query, movieParamsSearch.getTypes(), "type");
         }
+        if (movieParamsSearch.getGenres() != null && !movieParamsSearch.getGenres().isEmpty()) {
+//            formatingMultipleParameters(query, movieParamsSearch.getGenres(), "genres.name");
+            query.addCriteria(Criteria.where("genres.name").all(movieParamsSearch.getGenres()));
+        }
+//        if (movieParamsSearch.getCountries() != null) {
+//            formatingMultipleParameters(query, movieParamsSearch.getCountries(), "countries.name");
+//        }
         if (movieParamsSearch.getRatingMpaa() != null) {
             query.addCriteria(Criteria.where("ratingMpaa").is(movieParamsSearch.getRatingMpaa()));
+        }
+        if (movieParamsSearch.getAgeRating() != null) {
+            query.addCriteria(Criteria.where("ageRating").is(movieParamsSearch.getAgeRating()));
         }
         if (movieParamsSearch.getRatingKp() != null) {
             ratingQuery(query, movieParamsSearch.getRatingKp(), "rating.kp");
@@ -152,11 +159,16 @@ public class filmService {
             );
         } else if (!includeGenres.isEmpty()) {
             System.out.println("добавляем");
-            criteria.and("type").in(includeGenres);
+            criteria.and(source).in(includeGenres);
         } else if (!excludeGenres.isEmpty()) {
             System.out.println("исключаем");
-            criteria.and("type").nin(excludeGenres);
+            criteria.and(source).nin(excludeGenres);
         }
+
+        if (criteria.getCriteriaObject().isEmpty()) {
+            return;
+        }
+
         query.addCriteria(criteria);
     }
 
