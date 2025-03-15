@@ -1,34 +1,28 @@
-package com.search.SearchFilm.Services;
+package com.search.backend.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.search.SearchFilm.Models.Movie;
-import com.search.SearchFilm.Models.MovieModel;
-import com.search.SearchFilm.Models.MovieMongo;
-import com.search.SearchFilm.Models.MovieParamsSearch;
-import com.search.SearchFilm.Repositories.MovieRepository;
-import com.search.SearchFilm.Repositories.MovieRepositoryMongo;
+import com.search.backend.models.Movie;
+import com.search.backend.models.MovieMongo;
+import com.search.backend.models.MovieParamsSearch;
+import com.search.backend.repositories.MovieRepository;
+import com.search.backend.repositories.MovieRepositoryMongo;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 @Service
@@ -97,11 +91,7 @@ public class filmService {
             .lte(movieParamsSearch.getReleaseYearsEnd()));
         }
         else if(movieParamsSearch.getReleaseYearsStart() != null) {
-            LocalDate today = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY");
-            System.out.println(today.format(formatter));
             query.addCriteria(Criteria.where("year").gte(movieParamsSearch.getReleaseYearsStart()));
-//                    .lte(today.format(formatter)));
         }
         else if(movieParamsSearch.getReleaseYearsEnd() != null) {
             query.addCriteria(Criteria.where("year").lte(movieParamsSearch.getReleaseYearsEnd()));
@@ -109,49 +99,65 @@ public class filmService {
         if (movieParamsSearch.getId() != null) {
             query.addCriteria(Criteria.where("_id").is(movieParamsSearch.getId()));
         }
+        if (movieParamsSearch.getStatus() != null) {
+            formatingMultipleParameters(query, movieParamsSearch.getStatus(), "status");
+        }
         if (movieParamsSearch.getTypes() != null) {
-            List<String> includeGenres = new ArrayList<>();
-            List<String> excludeGenres = new ArrayList<>();
-            for (String type : movieParamsSearch.getTypes()) {
-                if (type.contains("!")) {
-                    excludeGenres.add(type.replace("!", ""));
-                }
-                else {
-                    System.out.println(type);
-                    includeGenres.add(type);
-                }
-            }
-
-            if (!includeGenres.isEmpty() && !excludeGenres.isEmpty()) {
-                // Включаем жанры из includeGenres и исключаем жанры из excludeGenres
-                criteria.andOperator(
-                        Criteria.where("type").in(includeGenres),
-                        Criteria.where("type").nin(excludeGenres)
-                );
-            } else if (!includeGenres.isEmpty()) {
-                // Только включаем жанры
-                System.out.println("добавляем");
-                criteria.and("type").in(includeGenres);
-            } else if (!excludeGenres.isEmpty()) {
-                // Только исключаем жанры
-                System.out.println("исключаем");
-                criteria.and("type").nin(excludeGenres);
-            }
-
-            query.addCriteria(criteria);
-
-//            if (!includeGenres.isEmpty()) {
-//                query.addCriteria(Criteria.where("genres").in(includeGenres));
-//            }
-//
-//            // Добавляем условия для исключения жанров
-//            if (!excludeGenres.isEmpty()) {
-//                query.addCriteria(Criteria.where("genres").nin(excludeGenres));
-//            }
-
-            return mongoTemplate.find(query, MovieMongo.class);
+            formatingMultipleParameters(query, movieParamsSearch.getTypes(), "type");
+        }
+        if (movieParamsSearch.getRatingMpaa() != null) {
+            query.addCriteria(Criteria.where("ratingMpaa").is(movieParamsSearch.getRatingMpaa()));
+        }
+        if (movieParamsSearch.getRatingKp() != null) {
+            ratingQuery(query, movieParamsSearch.getRatingKp(), "rating.kp");
+        }
+        if (movieParamsSearch.getRatingImdb() != null) {
+            ratingQuery(query, movieParamsSearch.getRatingImdb(), "rating.imdb");
+        }
+        if (movieParamsSearch.getRatingOwn() != null) {
+            ratingQuery(query, movieParamsSearch.getRatingOwn(), "rating.rate");
         }
         return mongoTemplate.find(query, MovieMongo.class);
+    }
+
+    private void ratingQuery(Query query, String rating, String source) {
+        if (rating.contains("-")) {
+            String[] ratingArray = rating.split("-");
+            query.addCriteria(Criteria.where(source).gte(Double.valueOf(ratingArray[0])).lte(Double.valueOf(ratingArray[1])));
+        }
+        else {
+            query.addCriteria(Criteria.where(source).gte(Double.valueOf(rating)));
+        }
+    }
+
+    private void formatingMultipleParameters(Query query, List<String> params, String source) {
+        Criteria criteria = new Criteria();
+        List<String> includeGenres = new ArrayList<>();
+        List<String> excludeGenres = new ArrayList<>();
+        for (String type : params) {
+            if (type.contains("!")) {
+                excludeGenres.add(type.replace("!", ""));
+            }
+            else {
+                System.out.println(type);
+                includeGenres.add(type);
+            }
+        }
+
+        if (!includeGenres.isEmpty() && !excludeGenres.isEmpty()) {
+            // Включаем жанры из includeGenres и исключаем жанры из excludeGenres
+            criteria.andOperator(
+                    Criteria.where(source).in(includeGenres),
+                    Criteria.where(source).nin(excludeGenres)
+            );
+        } else if (!includeGenres.isEmpty()) {
+            System.out.println("добавляем");
+            criteria.and("type").in(includeGenres);
+        } else if (!excludeGenres.isEmpty()) {
+            System.out.println("исключаем");
+            criteria.and("type").nin(excludeGenres);
+        }
+        query.addCriteria(criteria);
     }
 
     public String getFilms(int page) throws IOException {
