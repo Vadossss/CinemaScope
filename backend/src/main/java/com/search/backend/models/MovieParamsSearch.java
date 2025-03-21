@@ -20,7 +20,7 @@ public class MovieParamsSearch {
     private String ratingImdb;
     private String ratingOwn;
     private String ratingMpaa;
-    private String ageRating;
+    private Integer ageRating;
     private String votesKp;
     private String votesImdb;
     private String votesOwn;
