@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -62,10 +63,99 @@ public class MovieMongo {
     private String createdAt;
     @Field(write = Field.Write.ALWAYS)
     private String updatedAt;
+
     @Field(write = Field.Write.ALWAYS)
     private Poster poster;
+
+    @Field(write = Field.Write.ALWAYS)
     private WatchAbility watchability;
 
+    @Field(write = Field.Write.ALWAYS)
+    private Map<String, FeeEntry> fees;
+
+    @Field(write = Field.Write.ALWAYS)
+    private Map<String, String> premiere;
+
+    @Field(write = Field.Write.ALWAYS)
+    private Budget budget;
+
+    @Field(write = Field.Write.ALWAYS)
+    private List<SequelsAndPrequelsItem> sequelsAndPrequels;
+
+    private List<SimilarMoviesItem> similarMovies;
+
+    private List<AudienceItem> audience;
+
+    private Videos videos;
+
+
+    @Getter
+    @Setter
+    public static class Videos {
+        @Field(write = Field.Write.ALWAYS)
+        private List<VideoItem> trailers;
+    }
+
+    @Getter
+    @Setter
+    public static class VideoItem {
+        private String url;
+        private String name;
+        private String site;
+        private String type;
+    }
+
+    @Getter
+    @Setter
+    public static class AudienceItem {
+        private Long count;
+        private String country;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @Getter
+    @Setter
+    public static class SimilarMoviesItem {
+        private Long id;
+    }
+
+    @Getter
+    @Setter
+    public static class SequelsAndPrequelsItem {
+        @Field(write = Field.Write.ALWAYS)
+        private Long id;
+        @Field(write = Field.Write.ALWAYS)
+        private String name;
+        @Field(write = Field.Write.ALWAYS)
+        private String alternativeName;
+        @Field(write = Field.Write.ALWAYS)
+        private String enName;
+        @Field(write = Field.Write.ALWAYS)
+        private String type;
+        @Field(write = Field.Write.ALWAYS)
+        private Poster poster;
+        @Field(write = Field.Write.ALWAYS)
+        private WatchAbility watchability;
+        @Field(write = Field.Write.ALWAYS)
+        private Rating rating;
+        @Field(write = Field.Write.ALWAYS)
+        private Integer year;
+    }
+
+
+    @Getter
+    @Setter
+    public static class FeeEntry {
+        private long value;
+        private String currency;
+    }
+
+    @Getter
+    @Setter
+    public static class Budget {
+        private long value;
+        private String currency;
+    }
 
     @Getter
     @Setter
@@ -128,6 +218,7 @@ public class MovieMongo {
 
         }
     }
+
 
     @Getter
     @Setter
