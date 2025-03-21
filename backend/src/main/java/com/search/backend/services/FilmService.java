@@ -1,7 +1,6 @@
 package com.search.backend.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.search.backend.models.Movie;
 import com.search.backend.models.MovieMongo;
 import com.search.backend.models.MovieParamsSearch;
 import com.search.backend.repositories.MovieRepositoryMongo;
@@ -27,12 +26,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 public class FilmService {
 
     @Value("${KINO_API_KEY}")
-    private String KINO_API_KEY;
+    private String kinoApiKey;
 
     private final MongoTemplate mongoTemplate;
-
-//    @Autowired
-//    private MovieRepository movieRepository;
 
     private final MovieRepositoryMongo movieRepositoryMongo;
 
@@ -42,16 +38,6 @@ public class FilmService {
         this.mongoTemplate = mongoTemplate;
         this.movieRepositoryMongo = movieRepositoryMongo;
     }
-
-//    public void saveMovie(String json) {
-//        try {
-//            Movie movie = objectMapper.readValue(json, Movie.class);
-//            movieRepository.save(movie);
-////            System.out.println("Фильм сохранен: " + movie.getName());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     public void updateMovieScore(long id, int score) {
         Query query = new Query(Criteria.where("_id").is(id));
@@ -67,7 +53,7 @@ public class FilmService {
     private double calculateNewRating(long id, int score) {
         MovieMongo movie = mongoTemplate.findOne(new Query(Criteria.where("_id").is(id)), MovieMongo.class);
         if (movie == null) {
-            return score;  // Если фильма нет, устанавливаем первый рейтинг
+            return score;
         }
         double oldRating = movie.getRating().getRate();
         int oldVotes = movie.getVotes().getVote();
@@ -152,7 +138,6 @@ public class FilmService {
         }
 
         if (!includeGenres.isEmpty() && !excludeGenres.isEmpty()) {
-            // Включаем жанры из includeGenres и исключаем жанры из excludeGenres
             criteria.andOperator(
                     Criteria.where(source).in(includeGenres),
                     Criteria.where(source).nin(excludeGenres)
@@ -177,10 +162,23 @@ public class FilmService {
 
         Request request = new Request.Builder()
 //                .url("https://api.kinopoisk.dev/v1.4/movie?page=1&limit=250&selectFields=&type=movie&rating.kp=7-10")
-                .url(String.format("https://api.kinopoisk.dev/v1.4/movie?page=%d&limit=250", page))
+                .url(String.format("https://api.kinopoisk.dev/v1.4/movie?page=%d&limit=10&selectFields=id" +
+                        "&selectFields=externalId&selectFields=name&selectFields=name&selectFields=enName" +
+                        "&selectFields=alternativeName&selectFields=names&selectFields=description" +
+                        "&selectFields=shortDescription&selectFields=slogan&selectFields=type&selectFields=typeNumber" +
+                        "&selectFields=typeNumber&selectFields=isSeries&selectFields=status&selectFields=year" +
+                        "&selectFields=releaseYears&selectFields=rating&selectFields=ratingMpaa&selectFields=ageRating" +
+                        "&selectFields=votes&selectFields=seasonsInfo&selectFields=budget&selectFields=audience" +
+                        "&selectFields=movieLength&selectFields=seriesLength&selectFields=totalSeriesLength" +
+                        "&selectFields=genres&selectFields=countries&selectFields=poster&selectFields=backdrop" +
+                        "&selectFields=logo&selectFields=ticketsOnSale&selectFields=videos&selectFields=networks" +
+                        "&selectFields=persons&selectFields=facts&selectFields=fees&selectFields=premiere" +
+                        "&selectFields=similarMovies&selectFields=sequelsAndPrequels&selectFields=watchability" +
+                        "&selectFields=lists&selectFields=top10&selectFields=top250&selectFields=updatedAt" +
+                        "&selectFields=createdAt&id=276261", page))
                 .get()
                 .addHeader("accept", "application/json")
-                .addHeader("X-API-KEY", KINO_API_KEY)
+                .addHeader("X-API-KEY", kinoApiKey)
                 .build();
 
         Response response;
@@ -210,7 +208,7 @@ public class FilmService {
                 .url(url)
                 .get()
                 .addHeader("accept", "application/json")
-                .addHeader("X-API-KEY", KINO_API_KEY)
+                .addHeader("X-API-KEY", kinoApiKey)
                 .build();
 
         Response response;
@@ -228,41 +226,6 @@ public class FilmService {
         }
     }
 
-    public void parsing() {
-        String json = "{\n" +
-                "  \"id\": 5405057,\n" +
-                "  \"name\": \"Анора\",\n" +
-                "  \"alternativeName\": \"Anora\",\n" +
-                "  \"enName\": \"\",\n" +
-                "  \"type\": \"movie\",\n" +
-                "  \"year\": 2024,\n" +
-                "  \"description\": \"Бруклин. Стриптизерша Анора...\",\n" +
-                "  \"shortDescription\": \"Сын русского олигарха...\",\n" +
-                "  \"movieLength\": 139,\n" +
-                "  \"isSeries\": false,\n" +
-                "  \"ticketsOnSale\": true,\n" +
-                "  \"ratingMpaa\": \"r\",\n" +
-                "  \"ageRating\": 18,\n" +
-                "  \"externalId\": { \"kpHD\": \"17cee64de8a34309892b79925bc9582f\", \"tmdb\": 1064213 },\n" +
-                "  \"poster\": { \"url\": \"https://image.openmoviedb.com/poster.jpg\", \"previewUrl\": \"https://image.openmoviedb.com/preview.jpg\" },\n" +
-                "  \"genres\": [{ \"name\": \"драма\" }, { \"name\": \"мелодрама\" }, { \"name\": \"комедия\" }],\n" +
-                "  \"countries\": [{ \"name\": \"США\" }]\n" +
-                "}";
-
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            Movie movie = objectMapper.readValue(json, Movie.class);
-
-            // Вывод результата
-//            System.out.println("Название фильма: " + movie.getName());
-//            System.out.println("Год выпуска: " + movie.getYear());
-//            System.out.println("Жанры: ");
-            movie.getGenres().forEach(genre -> System.out.println("- " + genre.getName()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public String encoded(String text) {
         text = "+" + text;
         String encodedResult = null;
@@ -270,8 +233,7 @@ public class FilmService {
             encodedResult = URLEncoder.encode(text, StandardCharsets.UTF_8.name());
             System.out.println(encodedResult);
         } catch (UnsupportedEncodingException e) {
-            // not going to happen - value came from JDK's own StandardCharsets
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return encodedResult;
     }
