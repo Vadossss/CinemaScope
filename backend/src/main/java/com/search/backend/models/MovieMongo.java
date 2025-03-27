@@ -10,6 +10,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Класс для работы с элементом (фильма/сериала).
+ */
 @Getter
 @Setter
 @Document(collection = "movies")

@@ -5,6 +5,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * Класс для универсального поиска элементов (фильм/сериал)
+ */
 @Getter
 @Setter
 public class MovieParamsSearch {

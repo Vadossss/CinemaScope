@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Класс для работы с пользователем в MongoDB.
+ */
 @Document(collection = "users")
 @Getter
 @Setter
@@ -16,5 +19,5 @@ public class UserMongo {
     @Id
     private String id;
     private String username;
-    private Map<String, List<String>> categories = new HashMap<>();
+    private Map<String, List<String>> categories = new HashMap<>(); // Категории со списком фильмов, входящих в них
 }
