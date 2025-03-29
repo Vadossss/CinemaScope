@@ -9,27 +9,25 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import java.io.IOException;
-import java.util.Collections;
-
 
 public class JwtFilter extends GenericFilterBean {
 
     private final String secret;
+    private final MyUserDetails myUserDetails;
 
-    public JwtFilter(String secret) {
+    public JwtFilter(String secret, MyUserDetails myUserDetails) {
         this.secret = secret;
+        this.myUserDetails = myUserDetails;
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        System.out.println("я тут");
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String token = httpRequest.getHeader("Authorization");
 
@@ -39,8 +37,8 @@ public class JwtFilter extends GenericFilterBean {
                 DecodedJWT jwt = JWT.require(Algorithm.HMAC256(secret)).build().verify(token);
                 String username = jwt.getSubject();
 
+                UserDetails userDetails = myUserDetails.loadUserByUsername(username);
 
-                UserDetails userDetails = new User(username, "", Collections.emptyList());
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
