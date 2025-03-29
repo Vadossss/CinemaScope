@@ -19,5 +19,6 @@ public class UserMongo {
     @Id
     private String id;
     private String username;
+    private List<String> favoriteGenres;
     private Map<String, List<String>> categories = new HashMap<>(); // Категории со списком фильмов, входящих в них
 }
