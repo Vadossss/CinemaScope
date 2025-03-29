@@ -1,9 +1,7 @@
 package com.search.backend.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.backend.models.MovieMongo;
 import com.search.backend.models.MovieParamsSearch;
-import com.search.backend.repositories.MovieRepositoryMongo;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -30,13 +28,8 @@ public class FilmService {
 
     private final MongoTemplate mongoTemplate;
 
-    private final MovieRepositoryMongo movieRepositoryMongo;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    public FilmService(MongoTemplate mongoTemplate, MovieRepositoryMongo movieRepositoryMongo) {
+    public FilmService(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
-        this.movieRepositoryMongo = movieRepositoryMongo;
     }
 
     public void updateMovieScore(long id, int score) {
@@ -48,7 +41,6 @@ public class FilmService {
 
         mongoTemplate.updateFirst(query, update, MovieMongo.class);
     }
-
 
     private double calculateNewRating(long id, int score) {
         MovieMongo movie = mongoTemplate.findOne(new Query(Criteria.where("_id").is(id)), MovieMongo.class);
@@ -66,6 +58,7 @@ public class FilmService {
         Query query = new Query(criteria).limit(limit);
         return mongoTemplate.find(query, MovieMongo.class);
     }
+
 
     public List<MovieMongo> findMoviesInRange(MovieParamsSearch movieParamsSearch) {
         Query query = new Query().limit(movieParamsSearch.getLimit());
@@ -85,12 +78,12 @@ public class FilmService {
         if (movieParamsSearch.getStatus() != null) {
             formatingMultipleParameters(query, movieParamsSearch.getStatus(), "status");
         }
-        if (movieParamsSearch.getTypes() != null) {
-            formatingMultipleParameters(query, movieParamsSearch.getTypes(), "type");
-        }
+//        if (movieParamsSearch.getTypes() != null) {
+//            formatingMultipleParameters(query, movieParamsSearch.getTypes(), "type");
+//        }
         if (movieParamsSearch.getGenres() != null && !movieParamsSearch.getGenres().isEmpty()) {
-//            formatingMultipleParameters(query, movieParamsSearch.getGenres(), "genres.name");
-            query.addCriteria(Criteria.where("genres.name").all(movieParamsSearch.getGenres()));
+            formatingMultipleParameters(query, movieParamsSearch.getGenres(), "genres.name");
+//            query.addCriteria(Criteria.where("genres.name").all(movieParamsSearch.getGenres()));
         }
 //        if (movieParamsSearch.getCountries() != null) {
 //            formatingMultipleParameters(query, movieParamsSearch.getCountries(), "countries.name");
@@ -123,7 +116,7 @@ public class FilmService {
         }
     }
 
-    private void formatingMultipleParameters(Query query, List<String> params, String source) {
+    public void formatingMultipleParameters(Query query, List<String> params, String source) {
         Criteria criteria = new Criteria();
         List<String> includeGenres = new ArrayList<>();
         List<String> excludeGenres = new ArrayList<>();
