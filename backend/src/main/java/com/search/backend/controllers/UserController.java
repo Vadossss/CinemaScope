@@ -1,13 +1,13 @@
 package com.search.backend.controllers;
 
+import com.search.backend.models.FavoriteGenresRequest;
 import com.search.backend.models.NewItemToListRequest;
 import com.search.backend.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.BindingResult;
 
 /**
@@ -43,5 +43,16 @@ public class UserController {
         // Передаём данные в сервис для добавления элемента в категорию
         return userService.addItemToList(newItemToListRequest.getUserId(), newItemToListRequest.getItemId(),
                 newItemToListRequest.getCategoryName());
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_CLIENT')")
+    @PostMapping("/setFavoriteGenres")
+    public ResponseEntity<Object> formingFavoriteUserGenres(@RequestBody FavoriteGenresRequest favoriteGenresRequest) {
+        return userService.formingFavoriteUserGenres(favoriteGenresRequest.getUserId(), favoriteGenresRequest.getFavoriteGenres());
+    }
+
+    @GetMapping("/userPersonalCatalog")
+    public ResponseEntity<Object> getUserPersonalCatalog(@RequestParam int page, @RequestParam int size) {
+        return userService.paginatedFindMovieByParameters(page, size);
     }
 }
