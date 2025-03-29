@@ -1,13 +1,8 @@
-import {heroui} from "@heroui/react";
+/** @type {import('postcss-load-config').Config} */
 const config = {
-  content: [
-    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}"
-  ],
-  theme: {
-    extend: {},
+  plugins: {
+    tailwindcss: {},
   },
-  darkMode: "class",
-  plugins: ["@tailwindcss/postcss", heroui()],
 };
 
 export default config;
