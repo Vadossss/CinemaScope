@@ -4,7 +4,6 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,5 +19,6 @@ public class UserMongo {
     private String id;
     private String username;
     private List<String> favoriteGenres;
-    private Map<String, List<String>> categories = new HashMap<>(); // Категории со списком фильмов, входящих в них
+    private Map<String, List<String>> categories = new HashMap<>();
+    private Map<Long, Integer> scoresMap = new HashMap<>();
 }
