@@ -2,6 +2,8 @@ package com.search.backend.services;
 
 import com.search.backend.models.MovieMongo;
 import com.search.backend.models.MovieParamsSearch;
+import com.search.backend.models.UserMongo;
+import com.search.backend.repositories.UserMongoRepository;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -9,6 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -27,30 +32,14 @@ public class FilmService {
     private String kinoApiKey;
 
     private final MongoTemplate mongoTemplate;
+//    private final UserService userService;
+    private final UserMongoRepository userMongoRepository;
 
-    public FilmService(MongoTemplate mongoTemplate) {
+    public FilmService(MongoTemplate mongoTemplate, UserMongoRepository userMongoRepository) {
         this.mongoTemplate = mongoTemplate;
-    }
+//        this.userService = userService;
+        this.userMongoRepository = userMongoRepository;
 
-    public void updateMovieScore(long id, int score) {
-        Query query = new Query(Criteria.where("_id").is(id));
-
-        Update update = new Update()
-                .inc("votes.vote", 1)
-                .set("rating.rate", calculateNewRating(id, score));
-
-        mongoTemplate.updateFirst(query, update, MovieMongo.class);
-    }
-
-    private double calculateNewRating(long id, int score) {
-        MovieMongo movie = mongoTemplate.findOne(new Query(Criteria.where("_id").is(id)), MovieMongo.class);
-        if (movie == null) {
-            return score;
-        }
-        double oldRating = movie.getRating().getRate();
-        int oldVotes = movie.getVotes().getVote();
-        double newScore = (oldRating * oldVotes + score * 1.0) / (oldVotes + 1);
-        return Math.round(newScore * 10.0) / 10.0;
     }
 
     public List<MovieMongo> searchByNameRegex(String name, int limit) {
