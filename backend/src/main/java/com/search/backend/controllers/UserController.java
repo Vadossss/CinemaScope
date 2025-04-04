@@ -2,6 +2,7 @@ package com.search.backend.controllers;
 
 import com.search.backend.models.FavoriteGenresRequest;
 import com.search.backend.models.NewItemToListRequest;
+import com.search.backend.models.ScoreRequest;
 import com.search.backend.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -54,5 +55,12 @@ public class UserController {
     @GetMapping("/userPersonalCatalog")
     public ResponseEntity<Object> getUserPersonalCatalog(@RequestParam int page, @RequestParam int size) {
         return userService.paginatedFindMovieByParameters(page, size);
+    }
+
+    @PostMapping("/newScoreForFilm")
+    public ResponseEntity<Object> newScore(@RequestBody ScoreRequest scoreRequest) {
+        long id = scoreRequest.getId();
+        int score = scoreRequest.getScore();
+        return userService.addScoreForUser(id, score);
     }
 }

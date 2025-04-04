@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.backend.models.*;
 import com.search.backend.repositories.MovieRepositoryMongo;
 import com.search.backend.services.FilmService;
+import com.search.backend.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,15 +20,17 @@ public class MovieController {
 
     private final FilmService filmService;
     private final MovieRepositoryMongo movieRepository;
+    private final UserService userService;
 
-    public MovieController(FilmService filmService, MovieRepositoryMongo movieRepository) {
+    public MovieController(FilmService filmService, MovieRepositoryMongo movieRepository, UserService userService) {
         this.filmService = filmService;
         this.movieRepository = movieRepository;
+        this.userService = userService;
     }
 
     @GetMapping("/save")
     public void saveExampleMovie() throws IOException {
-        for (int page = 1; page <= 2 ; page++) {
+        for (int page = 1; page <= 100; page++) {
             String jo = filmService.getFilms(page);
             JsonNode js = (new ObjectMapper()).readTree(jo);
             for (JsonNode j : js.path("docs")) {
@@ -40,14 +43,6 @@ public class MovieController {
                 }
             }
         }
-    }
-
-    @PostMapping("/newScoreForFilm")
-    public ResponseEntity<String> newScore(@RequestBody ScoreRequest scoreRequest) {
-        long id = scoreRequest.getId();
-        int score = scoreRequest.getScore();
-        filmService.updateMovieScore(id, score);
-        return ResponseEntity.ok("Оценка успешно обновлена");
     }
 
     @GetMapping("/findByName")
