@@ -1,8 +1,6 @@
 package com.search.backend.controllers;
 
-import com.search.backend.models.FavoriteGenresRequest;
-import com.search.backend.models.NewItemToListRequest;
-import com.search.backend.models.ScoreRequest;
+import com.search.backend.models.*;
 import com.search.backend.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -62,5 +60,15 @@ public class UserController {
         long id = scoreRequest.getId();
         int score = scoreRequest.getScore();
         return userService.addScoreForUser(id, score);
+    }
+
+    @PostMapping("/newCommentForFilm")
+    public ResponseEntity<Object> newComment(@RequestBody CommentRequest commentRequest) {
+        return userService.addCommentForUser(commentRequest.getId(), commentRequest.getComment());
+    }
+
+    @PostMapping("/like")
+    public ResponseEntity<Object> like(@RequestBody LikeRequest likeRequest) {
+        return userService.addLikeForComment(likeRequest.getCommentId());
     }
 }
