@@ -7,10 +7,14 @@ import com.search.backend.repositories.UserMongoRepository;
 import com.search.backend.repositories.UserRepository;
 import com.search.backend.security.JwtUtil;
 import jakarta.transaction.Transactional;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,10 +37,37 @@ public class AuthService {
         this.userMongoRepository = userMongoRepository;
     }
 
-    private AuthResponse generateAuthResponse(AppUser user) {
-        String accessToken = jwtUtil.generateAccessToken(user.getUsername());
-        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
-        return new AuthResponse(accessToken, refreshToken);
+    private ResponseEntity<Object> generateAuthResponse(String user) {
+        String accessToken = jwtUtil.generateAccessToken(user);
+        String refreshToken = jwtUtil.generateRefreshToken(user);
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(Duration.ofDays(7))
+                .build();
+
+        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", accessToken)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(Duration.ofMinutes(30))
+                .build();
+
+        AuthResponse authResponse = new AuthResponse(accessToken);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())  // Устанавливаем refreshToken
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())   // Устанавливаем accessToken
+                .body(authResponse);
+    }
+
+    public ResponseEntity<Object> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails user = (UserDetails) authentication.getPrincipal();
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(user.getUsername());
     }
 
     @Transactional
@@ -50,8 +81,6 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(AppUserRole.ROLE_CLIENT);
-
-        AuthResponse authResponse = generateAuthResponse(user);
 
         AppUser savedUser = userRepository.save(user);
 
@@ -68,7 +97,7 @@ public class AuthService {
 
         userMongoRepository.save(userMongo);
 
-        return ResponseEntity.ok(authResponse);
+        return generateAuthResponse(user.getUsername());
     }
 
     public ResponseEntity<Object> loginUser(LoginRequest loginRequest) {
@@ -76,8 +105,7 @@ public class AuthService {
             AppUser user = userRepository.findByUsername(loginRequest.getUsername());
             if (passwordMatches(loginRequest.getPassword(),
                     user.getPassword())) {
-                AuthResponse authResponse = generateAuthResponse(user);
-                return ResponseEntity.ok(authResponse);
+                return generateAuthResponse(user.getUsername());
             }
             return ResponseEntity.status(401).body("Username or password is incorrect");
         }
@@ -90,9 +118,7 @@ public class AuthService {
             DecodedJWT decodedJWT = jwtUtil.validateToken(refreshTokenRequest.getRefreshToken());
 
             String username = decodedJWT.getSubject();
-            String accessToken = jwtUtil.generateAccessToken(username);
-            String refreshToken = jwtUtil.generateRefreshToken(username);
-            return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken));
+            return generateAuthResponse(username);
         }
         catch (JWTVerificationException e) {
             return ResponseEntity.status(401).body("Invalid refresh token");
