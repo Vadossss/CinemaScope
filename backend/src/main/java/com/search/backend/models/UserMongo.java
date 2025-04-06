@@ -4,6 +4,8 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +20,7 @@ public class UserMongo {
     @Id
     private String id;
     private String username;
-    private List<String> favoriteGenres;
+    private List<String> favoriteGenres = new ArrayList<>();
     private Map<String, List<String>> categories = new HashMap<>();
     private Map<Long, Integer> scores = new HashMap<>();
 }
