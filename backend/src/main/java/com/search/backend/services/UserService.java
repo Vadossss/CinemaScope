@@ -1,8 +1,10 @@
 package com.search.backend.services;
 
+import com.mongodb.client.result.UpdateResult;
 import com.search.backend.models.*;
+import com.search.backend.repositories.CommentRepository;
 import com.search.backend.repositories.UserMongoRepository;
-import com.search.backend.security.MyUserDetails;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -12,8 +14,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -29,16 +29,18 @@ public class UserService {
     private final UserMongoRepository userMongoRepository;
     private final FilmService filmService;
     private final MongoTemplate mongoTemplate;
+    private final CommentRepository commentRepository;
 
     /**
      * Конструктор сервиса пользователя
      * @param userMongoRepository Репозиторий для работы с пользователем в MongoDB.
      */
 
-    public UserService(UserMongoRepository userMongoRepository, FilmService filmService, MongoTemplate mongoTemplate) {
+    public UserService(UserMongoRepository userMongoRepository, FilmService filmService, MongoTemplate mongoTemplate, CommentRepository commentRepository) {
         this.userMongoRepository = userMongoRepository;
         this.filmService = filmService;
         this.mongoTemplate = mongoTemplate;
+        this.commentRepository = commentRepository;
     }
 
     public UserDetails getCurrentUser() {
@@ -75,6 +77,51 @@ public class UserService {
             userMongoRepository.save(userMongo);
             return ResponseEntity.ok().body("Оценка добавлена");
         }
+    }
+
+    public ResponseEntity<Object> addCommentForUser(Long id, String comment) {
+        UserDetails userDetails = getCurrentUser();
+        UserMongo userMongo = userMongoRepository.findByUsername(userDetails.getUsername());
+        CommentMongo commentData = new CommentMongo();
+        commentData.setComment(comment);
+        commentData.setMovieId(id);
+        commentData.setUserId(userMongo.getId());
+        commentData.setUserName(userMongo.getUsername());
+        commentRepository.save(commentData);
+        return ResponseEntity.ok().body("Комментарий добавлен");
+    }
+
+    public ResponseEntity<Object> addLikeForComment(String commentId) {
+        UserDetails userDetails = getCurrentUser();
+        UserMongo userMongo = userMongoRepository.findByUsername(userDetails.getUsername());
+
+        Query query = new Query(Criteria.where("_id").is(new ObjectId(commentId)));
+
+        CommentMongo commentData = mongoTemplate.findOne(query, CommentMongo.class);
+        if (commentData != null) {
+            if (commentData.getLikes().contains(userMongo.getId())) {
+                Update update = new Update().pull("likes", userMongo.getId());
+
+                UpdateResult result = mongoTemplate.updateFirst(query, update, CommentMongo.class);
+
+                if (result.getMatchedCount() > 0) {
+                    return ResponseEntity.ok().body("Оценка убрана");
+                } else {
+                    return ResponseEntity.status(401).body("Ошибка при изменении оценки");
+                }
+            }
+            else {
+                Update update = new Update().addToSet("likes", userMongo.getId());
+
+                UpdateResult result = mongoTemplate.updateFirst(query, update, CommentMongo.class);
+
+                if (result.getMatchedCount() == 0) {
+                    return ResponseEntity.status(401).body("Ошибка при установке оценки");
+                }
+                return ResponseEntity.ok().body("Лайк поставлен");
+            }
+        }
+        return ResponseEntity.status(401).body("Ошибка при установке оценки");
     }
 
     private double calculateNewRating(long id, int score) {
@@ -122,9 +169,14 @@ public class UserService {
 
     public ResponseEntity<Object> formingFavoriteUserGenres(String userId, List<String> favoriteGenres) {
         Optional<UserMongo> user = userMongoRepository.findById(userId);
-        user.get().setFavoriteGenres(favoriteGenres);
-        userMongoRepository.save(user.get());
-        return ResponseEntity.ok().body("Success");
+        if (user.isPresent()) {
+            user.get().setFavoriteGenres(favoriteGenres);
+            userMongoRepository.save(user.get());
+            return ResponseEntity.ok().body("Success");
+        }
+        else {
+            return ResponseEntity.status(401).body("Ошибка при формировании любимых жанров");
+        }
     }
 
     public List<UserMongo> getUsers(int page, int size) {
