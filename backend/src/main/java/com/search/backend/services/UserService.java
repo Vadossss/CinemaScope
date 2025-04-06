@@ -54,7 +54,7 @@ public class UserService {
         if (userMongo == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        Map<Long, Integer> scores = userMongo.getScoresMap();
+        Map<Long, Integer> scores = userMongo.getScores();
         Query query = new Query(Criteria.where("_id").is(id));
         if (scores.containsKey(id)) {
             Update update = new Update()
@@ -62,7 +62,7 @@ public class UserService {
             mongoTemplate.updateFirst(query, update, MovieMongo.class);
             scores.remove(id);
             scores.put(id, score);
-            userMongo.setScoresMap(scores);
+            userMongo.setScores(scores);
             userMongoRepository.save(userMongo);
             return ResponseEntity.ok().body("Оценка обновлена");
         }
@@ -73,7 +73,7 @@ public class UserService {
 
             mongoTemplate.updateFirst(query, update, MovieMongo.class);
             scores.put(id, score);
-            userMongo.setScoresMap(scores);
+            userMongo.setScores(scores);
             userMongoRepository.save(userMongo);
             return ResponseEntity.ok().body("Оценка добавлена");
         }

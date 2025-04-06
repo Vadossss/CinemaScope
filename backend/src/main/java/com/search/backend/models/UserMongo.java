@@ -20,5 +20,5 @@ public class UserMongo {
     private String username;
     private List<String> favoriteGenres;
     private Map<String, List<String>> categories = new HashMap<>();
-    private Map<Long, Integer> scoresMap = new HashMap<>();
+    private Map<Long, Integer> scores = new HashMap<>();
 }
