@@ -7,6 +7,7 @@ import { Select, SelectItem } from "@heroui/react";
 import { Tabs, Tab, Link, Card, CardBody } from "@heroui/react";
 import { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
+import { useAuth } from "../contexts/authContext";
 
 export const animals = [
     { key: "teenager", label: "12-16 лет" },
@@ -77,6 +78,7 @@ export const EyeFilledIcon = (props) => {
 };
 
 export default function Auth() {
+    const { auth } = useAuth();
     const [selected, setSelected] = React.useState("login");
     const [action, setAction] = React.useState(null);
     const [submitted, setSubmitted] = React.useState(null);
@@ -110,6 +112,12 @@ export default function Auth() {
     const toggleVisibility = () => setIsVisible(!isVisible);
 
     const errors = [];
+
+    useEffect(() => {
+        if (auth) {
+            router.push("/");
+        }
+    }, [auth])
 
     useEffect(() => {
         let loginError = login.length < 6 ? "Логин должен содержать минимум 6 символов" : "";
