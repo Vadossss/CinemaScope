@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
       >
         <AuthProvider>
           <Navbar />
-          <div className="flex min-h-[calc(96vh-4rem)] items-center justify-center">{children}</div>
+          <div className="mt-6 flex min-h-[calc(96vh-4rem)] items-center justify-center">{children}</div>
         </AuthProvider>
       </body>
     </html>
