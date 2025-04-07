@@ -5,16 +5,18 @@ import {
     NavbarBrand,
     NavbarContent,
     NavbarItem,
-    Link,
     Input,
     DropdownItem,
     DropdownTrigger,
     Dropdown,
     DropdownMenu,
     Avatar,
-    Button
+    Button,
+    User
 } from "@heroui/react";
 import { useState, useEffect } from "react";
+import { useAuth } from "../contexts/authContext";
+import Link from "next/link";
 
 export const AcmeLogo = () => {
     return (
@@ -59,6 +61,28 @@ export const SearchIcon = ({ size = 24, strokeWidth = 1.5, width, height, ...pro
     );
 };
 
+export const ChevronDown = ({ fill, size, height, width, ...props }) => {
+    return (
+        <svg
+            fill="none"
+            height={size || height || 24}
+            viewBox="0 0 24 24"
+            width={size || width || 24}
+            xmlns="http://www.w3.org/2000/svg"
+            {...props}
+        >
+            <path
+                d="m19.92 8.95-6.52 6.52c-.77.77-2.03.77-2.8 0L4.08 8.95"
+                stroke={fill}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeMiterlimit={10}
+                strokeWidth={1.5}
+            />
+        </svg>
+    );
+};
+
 const items = [
     {
         key: "profile",
@@ -78,6 +102,10 @@ const items = [
     },
 ];
 
+const icons = {
+    chevron: <ChevronDown fill="currentColor" size={16} />,
+};
+
 const navbarItems = [
     { value: "catalog", name: "Каталог" },
     { value: "catalog", name: "Каталог" }
@@ -86,56 +114,85 @@ const navbarItems = [
 let source = "http://localhost:8085";
 
 export default function App() {
-    const [auth, setAuth] = useState(false);
-    const [username, setUsername] = useState(false);
+    const { auth, username } = useAuth();
+    const [isLoading, setLoading] = useState(true);
 
     useEffect(() => {
-        const checkMe = async () => {
-            try {
-                const res = await fetch(source + "/auth/me",
-                    {
-                        method: "GET",
-                        credentials: "include"
-                    }
-                );
-
-                if (res.ok) {
-                    const data = await res.text();
-                    setUsername(data);
-                    setAuth(true);
-                }
-                else {
-                    console.log("здесь");
-
-                }
-            } catch (error) {
-                console.log(error);
-            }
+        if (auth !== undefined) {
+            setLoading(false);
         }
-        checkMe();
-    }, []);
+    }, [auth]);
 
+    if (isLoading) {
+        return (
+            <div>Загрузка</div>
+        )
+    }
 
     return (
         <Navbar isBordered>
             <NavbarContent justify="start">
                 <NavbarBrand className="mr-4">
-                    <AcmeLogo />
-                    <p className="hidden sm:block font-bold text-inherit">CSP</p>
+                    <Link className="flex items-center" href="/">
+                        <AcmeLogo />
+                        <p className="hidden sm:block font-bold text-inherit">CSP</p>
+                    </Link>
                 </NavbarBrand>
-                <NavbarContent className="hidden sm:flex gap-3">
-                    <NavbarItem>
+                <NavbarContent className="hidden sm:flex gap-3" justify="center">
+                    <Dropdown>
+                        <NavbarItem>
+                            <DropdownTrigger>
+                                <Button
+                                    disableRipple
+                                    className="text-base text-gray-500 font-bold transition ease-in-out delay-100 hover:text-black duration-150 p-0 text-base bg-transparent data-[hover=true]:bg-transparent"
+                                    radius="sm"
+                                    endContent={icons.chevron}
+                                    variant="light"
+                                >
+                                    Каталог
+                                </Button>
+                            </DropdownTrigger>
+                        </NavbarItem>
+                        <DropdownMenu
+                            aria-label="ACME features"
+                            itemClasses={{
+                                base: "gap-4",
+                            }}
+                        >
+                            <DropdownItem
+                                key="autoscaling"
+                            >
+                                Кино
+                            </DropdownItem>
+                            <DropdownItem
+                                key="usage_metrics"
+                            >
+                                Сериалы
+                            </DropdownItem>
+                            <DropdownItem
+                                key="production_ready"
+                            >
+                                Аниме
+                            </DropdownItem>
+                            <DropdownItem
+                                key="99_uptime"
+                            >
+                                Мультфильмы
+                            </DropdownItem>
+                        </DropdownMenu>
+                    </Dropdown>
+                    {/* <NavbarItem>
                         <Link color="foreground" href="#">
                             Каталог
                         </Link>
-                    </NavbarItem>
-                    <NavbarItem isActive>
-                        <Link aria-current="page" color="secondary" href="#">
+                    </NavbarItem> */}
+                    <NavbarItem>
+                        <Link className="text-base text-gray-500 font-bold transition ease-in-out delay-100 hover:text-black duration-150" href="#">
                             Персоны
                         </Link>
                     </NavbarItem>
                     <NavbarItem>
-                        <Link color="foreground" href="#">
+                        <Link className="text-base text-gray-500 font-bold transition ease-in-out delay-100 hover:text-black duration-150" href="#">
                             Медиа
                         </Link>
                     </NavbarItem>
@@ -160,20 +217,32 @@ export default function App() {
                     <Button as={Link} color="primary" href="/auth" variant="flat">
                         Войти
                     </Button>
-                </NavbarItem>) : (<Dropdown placement="bottom-end">
+                </NavbarItem>) : (<Dropdown placement="bottom-center">
                     <DropdownTrigger>
-                        <Avatar
-                            isBordered
+                        <User
                             as="button"
+                            avatarProps={{
+                                isBordered: true,
+                                src: "icon_avatar1.png",
+                            }}
                             className="transition-transform"
-                            color="secondary"
-                            name={username}
-                            size="sm"
-                            src="icon_avatar1.png"
                         />
                     </DropdownTrigger>
-                    <DropdownMenu aria-label="Dynamic Actions" items={items}>
-                        {(item) => (
+                    <DropdownMenu aria-label="Dynamic Actions">
+                        <DropdownItem key="me" isReadOnly className="h-12 gap-2 opacity-100">
+                            <User
+                                avatarProps={{
+                                    size: "sm",
+                                    src: "icon_avatar1.png",
+                                }}
+                                classNames={{
+                                    name: "text-default-600",
+                                    description: "text-default-500",
+                                }}
+                                name={`${username}`}
+                            />
+                        </DropdownItem>
+                        {items.map((item) => (
                             <DropdownItem
                                 key={item.key}
                                 className={item.key === "logout" ? "text-danger" : ""}
@@ -181,7 +250,7 @@ export default function App() {
                             >
                                 {item.label}
                             </DropdownItem>
-                        )}
+                        ))}
                     </DropdownMenu>
                 </Dropdown>)}
             </NavbarContent>
