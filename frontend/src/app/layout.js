@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/app/components/Navbar";
 import { AuthProvider } from "./contexts/authContext";
+import { Amatic_SC } from "next/font/google";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,6 +14,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const amatic = Amatic_SC({
+  subsets: ["cyrillic"], // или ['cyrillic'], если нужен кириллический шрифт
+  display: "swap",
+  weight: ["400", "700"], // выбираешь нужные начертания
 });
 
 // export const metadata = {
@@ -28,7 +35,7 @@ export default function RootLayout({ children }) {
       >
         <AuthProvider>
           <Navbar />
-          <div className="mt-6 flex min-h-[calc(96vh-4rem)] items-center justify-center">{children}</div>
+          <div className="mt-6 flex flex-col items-center min-h-[calc(96vh-4rem)]">{children}</div>
         </AuthProvider>
       </body>
     </html>
