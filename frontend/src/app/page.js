@@ -3,9 +3,11 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import MovieCard from "@/app/components/MovieCard";
+import { fetchMovies } from "./utils/fetchMovies";
+import ScrollMovie from "./components/ScrollMovie";
 
 export default function Home() {
-  const [data, setData] = useState();
+  const [data, setData] = useState(null);
   const [isLoading, setLoading] = useState(true);
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
@@ -21,33 +23,15 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const res = await fetch("http://localhost:8085/films/movie", {
-          method: "POST",
-          body: raw,
-          redirect: "follow",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json"
-          },
-        });
+      const [result, isLoading] = await fetchMovies();
+      setData(result);
+      setLoading(isLoading);
+    };
 
-        if (res.ok) {
-          setData(await res.json());
-          setLoading(false);
-        }
-        else {
-          console.log("Ошибка");
-
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
     fetchData();
   }, []);
 
-  if (isLoading) {
+  if (isLoading && data !== null) {
     return (
       <div>Загрузка </div>
     )
@@ -58,10 +42,15 @@ export default function Home() {
 
 
   return (
-    <div className="grid grid-flow-row grid-cols-9 gap-4">
-      {data.map((movie) => (
-        <MovieCard key={movie.id} data={movie} />
-      ))}
+    <div className="max-w-[1504px]">
+      <ScrollMovie data={data} />
+      {/* <div className="grid grid-flow-row grid-cols-9 gap-4">
+
+        {data !== undefined && data.map((movie) => (
+          <MovieCard key={movie.id} data={movie} />
+        ))}
+
+      </div> */}
     </div>
   );
 }
