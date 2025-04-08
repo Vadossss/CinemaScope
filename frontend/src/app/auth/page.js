@@ -8,6 +8,7 @@ import { Tabs, Tab, Link, Card, CardBody } from "@heroui/react";
 import { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import { useAuth } from "../contexts/authContext";
+import { fetchLogin } from "../utils/fetchLogin"
 
 export const animals = [
     { key: "teenager", label: "12-16 лет" },
@@ -78,7 +79,7 @@ export const EyeFilledIcon = (props) => {
 };
 
 export default function Auth() {
-    const { auth } = useAuth();
+    const { auth, setAuth } = useAuth();
     const [selected, setSelected] = React.useState("login");
     const [action, setAction] = React.useState(null);
     const [submitted, setSubmitted] = React.useState(null);
@@ -218,52 +219,44 @@ export default function Auth() {
         }
     }
 
-    async function handleLoginSubmit(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const data = Object.fromEntries(formData);
-        console.log('Submitting form:', data);
-        // const captchaResponse = grecaptcha.getResponse();
+    // async function handleLoginSubmit(event) {
+    //     event.preventDefault();
+    //     const formData = new FormData(event.target);
+    //     const data = Object.fromEntries(formData);
+    //     console.log('Submitting form:', data);
 
-        // if (!captchaResponse) {
-        //   setLoginMessage("Пожалуйста, пройдите проверку reCAPTCHA.");
-        //   return;
-        // }
+    //     try {
+    //         const res = await fetch(source2 + `/auth/login`, {
+    //             method: "POST",
+    //             headers: { "Content-Type": "application/json" },
+    //             body: JSON.stringify(data),
+    //             credentials: "include"
+    //         });
+    //         // console.log('Submitting form:', data);
+    //         // const errorData = await res.text();
 
-        // data.captcha = captchaResponse;
+    //         const dataRes = await res.json();
 
-        try {
-            const res = await fetch(source2 + `/auth/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
-                credentials: "include"
-            });
-            // console.log('Submitting form:', data);
-            // const errorData = await res.text();
+    //         console.log(dataRes);
 
-            const dataRes = await res.json();
+    //         if (res.status === 200) {
+    //             router.push("/");
+    //         } else {
+    //             setLoginMessage(dataRes.error);
+    //             console.log(dataRes);
+    //         }
 
-            console.log(dataRes);
+    //         // if (res.status === 401) {
+    //         //   setLoginMessage(errorData);
+    //         // }
+    //         // if (res.ok) {
+    //         //   router.push("/dashboard");
+    //         // }
 
-            if (res.status === 200) {
-                router.push("/");
-            } else {
-                setLoginMessage(dataRes.error);
-                console.log(dataRes);
-            }
-
-            // if (res.status === 401) {
-            //   setLoginMessage(errorData);
-            // }
-            // if (res.ok) {
-            //   router.push("/dashboard");
-            // }
-
-        } catch (error) {
-            // setLoginMessage(error);
-        }
-    }
+    //     } catch (error) {
+    //         // setLoginMessage(error);
+    //     }
+    // }
 
 
     return (
@@ -282,7 +275,7 @@ export default function Auth() {
                         <Tab key="login" title="Войти" >
                             <Form
                                 className="flex flex-col gap-2"
-                                onSubmit={handleLoginSubmit}
+                                onSubmit={(e) => fetchLogin(e, { setAuth, router, setLoginMessage })}
                                 validationBehavior="native"
                             >
                                 <Input
