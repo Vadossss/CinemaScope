@@ -5,6 +5,8 @@ import "./globals.css";
 import Navbar from "@/app/components/Navbar";
 import { AuthProvider } from "./contexts/authContext";
 import { Amatic_SC } from "next/font/google";
+import { HeroUIProvider } from '@heroui/react'
+import { ToastProvider } from "@heroui/toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,7 +37,10 @@ export default function RootLayout({ children }) {
       >
         <AuthProvider>
           <Navbar />
-          <div className="mt-6 flex flex-col items-center min-h-[calc(96vh-4rem)]">{children}</div>
+          <HeroUIProvider>
+            <ToastProvider />
+            <div className="mt-4 flex flex-col items-center min-h-[calc(96vh-4rem)]">{children}</div>
+          </HeroUIProvider>
         </AuthProvider>
       </body>
     </html>
