@@ -3,8 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --background: rgb(214, 214, 214);
   --foreground: #171717;
+  --swiper-navigation-color: var(--background);
+  --swiper-navigation-top-offset: 35%;
+  --swiper-navigation-background: var(--background);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,5 +20,10 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  /* font-family: Arial, Helvetica, sans-serif; */
+  /* font-family: "Rubik", sans-serif; */
+
+
+  font-family: "Amatic SC", sans-serif;
+
 }
