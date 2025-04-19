@@ -18,6 +18,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -46,6 +48,16 @@ public class UserService {
     public UserDetails getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (UserDetails) authentication.getPrincipal();
+    }
+
+    public List<MovieMongo> recommendationForUser() {
+        UserDetails currentUser = getCurrentUser();
+        UserMongo userMongo = userMongoRepository.findByUsername(currentUser.getUsername());
+        List<String> favoriteGenres = userMongo.getFavoriteGenres();
+        MovieParamsSearch movieParamsSearch = new MovieParamsSearch();
+//        movieParamsSearch.setGenres(favoriteGenres);
+        movieParamsSearch.setVotesKp("1000");
+        return filmService.findMoviesInRange(movieParamsSearch);
     }
 
     public ResponseEntity<Object> addScoreForUser(long id, int score) {
@@ -83,6 +95,9 @@ public class UserService {
         UserDetails userDetails = getCurrentUser();
         UserMongo userMongo = userMongoRepository.findByUsername(userDetails.getUsername());
         CommentMongo commentData = new CommentMongo();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'в' HH:mm", new Locale("ru"));
+        String createdAt = LocalDateTime.now().format(formatter);
+        commentData.setCreatedAt(createdAt);
         commentData.setComment(comment);
         commentData.setMovieId(id);
         commentData.setUserId(userMongo.getId());
@@ -91,38 +106,130 @@ public class UserService {
         return ResponseEntity.ok().body("Комментарий добавлен");
     }
 
-    public ResponseEntity<Object> addLikeForComment(String commentId) {
+    public ResponseEntity<Object> toggleReactionForComment(String commentId, boolean isLike) {
         UserDetails userDetails = getCurrentUser();
         UserMongo userMongo = userMongoRepository.findByUsername(userDetails.getUsername());
 
+        if (userMongo == null) {
+            return ResponseEntity.status(404).body("Пользователь не найден");
+        }
+
         Query query = new Query(Criteria.where("_id").is(new ObjectId(commentId)));
+        CommentMongo comment = mongoTemplate.findOne(query, CommentMongo.class);
 
-        CommentMongo commentData = mongoTemplate.findOne(query, CommentMongo.class);
-        if (commentData != null) {
-            if (commentData.getLikes().contains(userMongo.getId())) {
-                Update update = new Update().pull("likes", userMongo.getId());
+        if (comment == null) {
+            return ResponseEntity.status(404).body("Комментарий не найден");
+        }
 
-                UpdateResult result = mongoTemplate.updateFirst(query, update, CommentMongo.class);
+        Update update = new Update();
+        boolean alreadyReacted = false;
 
-                if (result.getMatchedCount() > 0) {
-                    return ResponseEntity.ok().body("Оценка убрана");
-                } else {
-                    return ResponseEntity.status(401).body("Ошибка при изменении оценки");
-                }
+        if (isLike) {
+            if (comment.getLikes().contains(userMongo.getId())) {
+                update.pull("likes", userMongo.getId());
+                alreadyReacted = true;
+            } else {
+                update.addToSet("likes", userMongo.getId());
+                update.pull("dislikes", userMongo.getId());
             }
-            else {
-                Update update = new Update().addToSet("likes", userMongo.getId());
-
-                UpdateResult result = mongoTemplate.updateFirst(query, update, CommentMongo.class);
-
-                if (result.getMatchedCount() == 0) {
-                    return ResponseEntity.status(401).body("Ошибка при установке оценки");
-                }
-                return ResponseEntity.ok().body("Лайк поставлен");
+        } else {
+            if (comment.getDislikes().contains(userMongo.getId())) {
+                update.pull("dislikes", userMongo.getId());
+                alreadyReacted = true;
+            } else {
+                update.addToSet("dislikes", userMongo.getId());
+                update.pull("likes", userMongo.getId());
             }
         }
-        return ResponseEntity.status(401).body("Ошибка при установке оценки");
+
+        UpdateResult result = mongoTemplate.updateFirst(query, update, CommentMongo.class);
+
+        if (result.getMatchedCount() == 0) {
+            return ResponseEntity.status(500).body("Ошибка при обновлении реакции");
+        }
+
+        // После обновления надо снова получить актуальные данные комментария
+        CommentMongo updatedComment = mongoTemplate.findOne(query, CommentMongo.class);
+
+        if (updatedComment == null) {
+            return ResponseEntity.status(500).body("Ошибка при получении обновлённого комментария");
+        }
+
+        // Формируем ответ
+        Map<String, Object> response = new HashMap<>();
+        response.put("count", updatedComment.getLikes().size() - updatedComment.getDislikes().size());
+//        response.put("dislikes", updatedComment.getDislikes().size());
+        response.put("status", alreadyReacted ? "reaction_removed" : (isLike ? "liked" : "disliked"));
+
+        return ResponseEntity.ok(response);
     }
+
+
+//    public ResponseEntity<Object> addLikeForComment(String commentId) {
+//        UserDetails userDetails = getCurrentUser();
+//        UserMongo userMongo = userMongoRepository.findByUsername(userDetails.getUsername());
+//
+//        Query query = new Query(Criteria.where("_id").is(new ObjectId(commentId)));
+//
+//        CommentMongo commentData = mongoTemplate.findOne(query, CommentMongo.class);
+//        if (commentData != null) {
+//            if (commentData.getLikes().contains(userMongo.getId())) {
+//                Update update = new Update().pull("likes", userMongo.getId());
+//
+//                UpdateResult result = mongoTemplate.updateFirst(query, update, CommentMongo.class);
+//
+//                if (result.getMatchedCount() > 0) {
+//                    return ResponseEntity.ok().body("-");
+//                } else {
+//                    return ResponseEntity.status(401).body("Ошибка при изменении оценки");
+//                }
+//            }
+//            else {
+//                Update update = new Update().addToSet("likes", userMongo.getId());
+//
+//                UpdateResult result = mongoTemplate.updateFirst(query, update, CommentMongo.class);
+//
+//                if (result.getMatchedCount() == 0) {
+//                    return ResponseEntity.status(401).body("Ошибка при установке оценки");
+//                }
+//                return ResponseEntity.ok().body("+");
+//            }
+//        }
+//        return ResponseEntity.status(401).body("Ошибка при установке оценки");
+//    }
+//
+//    public ResponseEntity<Object> addDislikeForComment(String commentId) {
+//        UserDetails userDetails = getCurrentUser();
+//        UserMongo userMongo = userMongoRepository.findByUsername(userDetails.getUsername());
+//
+//        Query query = new Query(Criteria.where("_id").is(new ObjectId(commentId)));
+//
+//        CommentMongo commentData = mongoTemplate.findOne(query, CommentMongo.class);
+//        if (commentData != null) {
+//            if (commentData.getDislikes().contains(userMongo.getId())) {
+//                Update update = new Update().pull("dislikes", userMongo.getId());
+//
+//                UpdateResult result = mongoTemplate.updateFirst(query, update, CommentMongo.class);
+//
+//                if (result.getMatchedCount() > 0) {
+//                    return ResponseEntity.ok().body("+");
+//                } else {
+//                    return ResponseEntity.status(401).body("Ошибка при изменении оценки");
+//                }
+//            }
+//            else {
+//                Update update = new Update().addToSet("dislikes", userMongo.getId());
+//
+//                UpdateResult result = mongoTemplate.updateFirst(query, update, CommentMongo.class);
+//
+//                if (result.getMatchedCount() == 0) {
+//                    return ResponseEntity.status(401).body("Ошибка при установке оценки");
+//                }
+//                return ResponseEntity.ok().body("-");
+//            }
+//        }
+//        return ResponseEntity.status(401).body("Ошибка при установке оценки");
+//    }
 
     private double calculateNewRating(long id, int score) {
         MovieMongo movie = mongoTemplate.findOne(new Query(Criteria.where("_id").is(id)), MovieMongo.class);
@@ -148,11 +255,12 @@ public class UserService {
 
     public ResponseEntity<Object> paginatedFindMovieByParameters(int page, int size) {
         System.out.println(getCurrentUser().getUsername());
-        UserMongo user = userMongoRepository.findByUsername(getCurrentUser().getUsername());
+            UserMongo user = userMongoRepository.findByUsername(getCurrentUser().getUsername());
         List<String> genres = user.getFavoriteGenres();
         if (genres != null && !genres.isEmpty()) {
             Query query = new Query();
             filmService.formatingMultipleParameters(query, genres, "genres.name");
+            query.addCriteria(Criteria.where("rating.kp").gte(6));
 
             long totalElements = mongoTemplate.count(query, MovieMongo.class);
 
@@ -168,10 +276,11 @@ public class UserService {
     }
 
     public ResponseEntity<Object> formingFavoriteUserGenres(String userId, List<String> favoriteGenres) {
-        Optional<UserMongo> user = userMongoRepository.findById(userId);
-        if (user.isPresent()) {
-            user.get().setFavoriteGenres(favoriteGenres);
-            userMongoRepository.save(user.get());
+        UserDetails userDetails = getCurrentUser();
+        UserMongo user = userMongoRepository.findByUsername(userDetails.getUsername());
+        if (user != null) {
+            user.setFavoriteGenres(favoriteGenres);
+            userMongoRepository.save(user);
             return ResponseEntity.ok().body("Success");
         }
         else {
@@ -195,11 +304,10 @@ public class UserService {
      * @return Возвращает HTTP-ответ со статусом и пояснением к статусу
      */
 
-    public ResponseEntity<Object> addItemToList(String userId, String itemId, String categoryName) {
-
+    public ResponseEntity<Object> addItemToList(String itemId, String categoryName) {
+        UserDetails userDetails = getCurrentUser();
         // Получаем пользователя из mongo, если он не существует, присваиваем null
-        UserMongo userMongo = userMongoRepository.findById(userId)
-                .orElse(null);
+        UserMongo userMongo = userMongoRepository.findByUsername(userDetails.getUsername());
         if (userMongo == null) {
             return ResponseEntity.status(400).body("User not found");
         }
