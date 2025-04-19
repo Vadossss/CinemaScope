@@ -8,6 +8,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -20,8 +21,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -48,9 +51,50 @@ public class FilmService {
         return mongoTemplate.find(query, MovieMongo.class);
     }
 
+    public ResponseEntity<Object> getMovieById(Long id) {
+        MovieMongo movie =  mongoTemplate.findById(id, MovieMongo.class);
+        if (movie == null) {
+            return ResponseEntity.status(404).body("Movie not found");
+        }
+        return ResponseEntity.ok(movie);
+    }
+
+    public List<MovieMongo> actualMovie() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("year").gte(2025))
+                .with(Sort.by(Sort.Order.desc("createdAt")));
+        List<MovieMongo> movies = mongoTemplate.find(query, MovieMongo.class);
+
+        double weightViews = 0.5;
+        double weightRating = 2.0;
+
+        movies.parallelStream().forEach(movie -> {
+            if (movie.getVotes().getKp() <= 10000 && movie.getRating().getKp() < 5) {
+                movie.setPopularity(0);
+            }
+            else {
+                double popularity = (movie.getVotes().getKp() * weightViews) +
+                        (movie.getRating().getKp() * weightRating);
+                movie.setPopularity(popularity);
+            }
+        });
+
+//        // Вычисляем популярность для каждого фильма
+//        for (MovieMongo movie : movies) {
+//            double popularity = (movie.getVotes().getKp() * weightViews) +
+//                    (movie.getRating().getKp() * weightRating);
+//            movie.setPopularity(popularity);  // Устанавливаем популярность в объект фильма
+//        }
+
+        // Сортируем фильмы по популярности в убывающем порядке
+        movies.sort((movie1, movie2) -> Double.compare(movie2.getPopularity(), movie1.getPopularity()));
+
+        return movies.stream().limit(30).collect(Collectors.toList()); // Возвращаем только топ 30 популярных фильмов
+    }
+
 
     public List<MovieMongo> findMoviesInRange(MovieParamsSearch movieParamsSearch) {
-        Query query = new Query().limit(movieParamsSearch.getLimit());
+        Query query = new Query().limit(30);
         if (movieParamsSearch.getReleaseYearsStart() != null && movieParamsSearch.getReleaseYearsEnd() != null) {
             query.addCriteria(Criteria.where("year").gte(movieParamsSearch.getReleaseYearsStart())
             .lte(movieParamsSearch.getReleaseYearsEnd()));
@@ -144,7 +188,7 @@ public class FilmService {
 
         Request request = new Request.Builder()
 //                .url("https://api.kinopoisk.dev/v1.4/movie?page=1&limit=250&selectFields=&type=movie&rating.kp=7-10")
-                .url(String.format("https://api.kinopoisk.dev/v1.4/movie?page=%d&limit=10&selectFields=id" +
+                .url(String.format("https://api.kinopoisk.dev/v1.4/movie?page=%d&limit=250&selectFields=id" +
                         "&selectFields=externalId&selectFields=name&selectFields=name&selectFields=enName" +
                         "&selectFields=alternativeName&selectFields=names&selectFields=description" +
                         "&selectFields=shortDescription&selectFields=slogan&selectFields=type&selectFields=typeNumber" +
@@ -157,7 +201,7 @@ public class FilmService {
                         "&selectFields=persons&selectFields=facts&selectFields=fees&selectFields=premiere" +
                         "&selectFields=similarMovies&selectFields=sequelsAndPrequels&selectFields=watchability" +
                         "&selectFields=lists&selectFields=top10&selectFields=top250&selectFields=updatedAt" +
-                        "&selectFields=createdAt&id=276261", page))
+                        "&selectFields=createdAt", page))
                 .get()
                 .addHeader("accept", "application/json")
                 .addHeader("X-API-KEY", kinoApiKey)
