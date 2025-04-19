@@ -2,9 +2,9 @@ package com.search.backend.controllers;
 
 import com.search.backend.models.AppUser;
 import com.search.backend.models.LoginRequest;
-import com.search.backend.models.RefreshTokenRequest;
 import com.search.backend.models.SetRoleRequest;
 import com.search.backend.services.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -36,8 +36,8 @@ public class AuthController {
     }
 
     @PostMapping("/updateRefreshToken")
-    public ResponseEntity<Object> updateRefreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
-        return authService.updateRefreshToken(refreshTokenRequest);
+    public ResponseEntity<Object> updateRefreshToken(HttpServletRequest request) {
+        return authService.updateRefreshToken(request);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
