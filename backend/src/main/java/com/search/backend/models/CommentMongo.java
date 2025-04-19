@@ -3,10 +3,9 @@ package com.search.backend.models;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,7 +14,8 @@ import java.util.Set;
 @Setter
 public class CommentMongo {
     @Id
-    private Long commentId;
+    @Field("_id")
+    private String commentId;
 
     private Long movieId;
 
@@ -23,8 +23,7 @@ public class CommentMongo {
     private String userName;
     private String comment;
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     Set<String> likes = new HashSet<>();
     Set<String> dislikes = new HashSet<>();
