@@ -3,12 +3,13 @@ package com.search.backend.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * Класс для работы с элементом (фильма/сериала).
@@ -90,7 +91,7 @@ public class MovieMongo {
     private List<AudienceItem> audience;
 
     private Videos videos;
-
+    private double popularity;
 
     @Getter
     @Setter
