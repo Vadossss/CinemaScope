@@ -6,6 +6,7 @@ import com.search.backend.models.*;
 import com.search.backend.repositories.UserMongoRepository;
 import com.search.backend.repositories.UserRepository;
 import com.search.backend.security.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
@@ -67,7 +68,11 @@ public class AuthService {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok(user.getUsername());
+        UserMongo userMongo = userMongoRepository.findByUsername(user.getUsername());
+        if (userMongo == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(new CheckMeResponse(userMongo.getId(), user.getUsername(), user.getAuthorities().iterator().next().getAuthority()));
     }
 
     @Transactional
@@ -112,10 +117,24 @@ public class AuthService {
         return ResponseEntity.status(401).body("Username or password is incorrect");
     }
 
-    public ResponseEntity<Object> updateRefreshToken(RefreshTokenRequest refreshTokenRequest) {
-        try {
+    public ResponseEntity<Object> updateRefreshToken(HttpServletRequest request) {
+        String refreshToken = null;
 
-            DecodedJWT decodedJWT = jwtUtil.validateToken(refreshTokenRequest.getRefreshToken());
+        if (request.getCookies() != null) {
+            for (var cookie : request.getCookies()) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (refreshToken == null) {
+            return ResponseEntity.status(401).body("Refresh token not found");
+        }
+
+        try {
+            DecodedJWT decodedJWT = jwtUtil.validateToken(refreshToken);
 
             String username = decodedJWT.getSubject();
             return generateAuthResponse(username);
