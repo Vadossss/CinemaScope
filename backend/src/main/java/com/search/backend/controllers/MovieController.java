@@ -30,13 +30,14 @@ public class MovieController {
 
     @GetMapping("/save")
     public void saveExampleMovie() throws IOException {
-        for (int page = 1; page <= 100; page++) {
+        for (int page = 1; page <= 2; page++) {
             String jo = filmService.getFilms(page);
             JsonNode js = (new ObjectMapper()).readTree(jo);
             for (JsonNode j : js.path("docs")) {
                 try {
                     ObjectMapper objectMapper = new ObjectMapper();
                     MovieMongo movie = objectMapper.readValue(j.toString(), MovieMongo.class);
+                    System.out.println(movie.getId());
                     movieRepository.save(movie);
                 } catch (Exception e) {
                     throw new IOException(e.getMessage());
@@ -63,7 +64,17 @@ public class MovieController {
         return filmService.searchFilms(list, ratingLow, ratingTop);
     }
 
-    @GetMapping("/movie")
+    @GetMapping("/getMovieById")
+    public ResponseEntity<Object> getMovie(@RequestParam Long id) {
+        return filmService.getMovieById(id);
+    }
+
+    @GetMapping("/popularNow")
+    public List<MovieMongo> getPopularNow() {
+        return filmService.actualMovie();
+    }
+
+    @PostMapping("/movie")
     public List<MovieMongo> getMovies(@RequestBody MovieParamsSearch movieParamsSearch) {
         return filmService.findMoviesInRange(movieParamsSearch);
     }
