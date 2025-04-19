@@ -13,6 +13,10 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        'like-hover': 'rgba(60, 206, 123, .15)',
+        'like-arrow-hover': '#3cce7b',
+        'dislike-hover': 'rgba(244, 67, 54, .15)',
+        'dislike-arrow-hover': '#f44336',
       },
     },
   },
