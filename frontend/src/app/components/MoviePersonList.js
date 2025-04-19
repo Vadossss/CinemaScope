@@ -4,7 +4,7 @@ import PersonFilmLike from "@/app/components/PersonFilmLink";
 export default function MoviePersonList({filmData, title, filterValue, description}) {
     return (
         <>
-        {filmData.persons.filter(p => p.profession === filterValue).length > 0 &&
+        {filmData.persons !== null && filmData.persons.filter(p => p.profession === filterValue).length > 0 &&
             <div className="flex flex-col mb-6">
                 <div className="mb-2">
                     <Link className="flex gap-2" href={`/films/${filmData.id}/cast`}>
