@@ -14,10 +14,6 @@ import lombok.Setter;
 public class NewItemToListRequest {
     @NotBlank
     @NotNull
-    private String userId;
-
-    @NotBlank
-    @NotNull
     private String itemId;
 
     @NotBlank
