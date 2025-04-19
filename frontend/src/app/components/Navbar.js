@@ -10,13 +10,10 @@ import {
     DropdownTrigger,
     Dropdown,
     DropdownMenu,
-    Avatar,
     Button,
-    User
 } from "@heroui/react";
-import { useState, useEffect } from "react";
-import { useAuth } from "../contexts/authContext";
 import Link from "next/link";
+import ButtonNavbar from "@/app/components/ButtonNavbar"
 
 export const AcmeLogo = () => {
     return (
@@ -83,54 +80,13 @@ export const ChevronDown = ({ fill, size, height, width, ...props }) => {
     );
 };
 
-const items = [
-    {
-        key: "profile",
-        label: "Мой профиль",
-    },
-    {
-        key: "grades",
-        label: "Оценки",
-    },
-    {
-        key: "settings",
-        label: "Настройки",
-    },
-    {
-        key: "logout",
-        label: "Выйти",
-    },
-];
-
 const icons = {
     chevron: <ChevronDown fill="currentColor" size={16} />,
 };
 
-const navbarItems = [
-    { value: "catalog", name: "Каталог" },
-    { value: "catalog", name: "Каталог" }
-]
-
-let source = "http://localhost:8085";
-
 export default function App() {
-    const { auth, username } = useAuth();
-    const [isLoading, setLoading] = useState(true);
-
-    useEffect(() => {
-        if (auth !== undefined) {
-            setLoading(false);
-        }
-    }, [auth]);
-
-    if (isLoading) {
-        return (
-            <div>Загрузка</div>
-        )
-    }
-
     return (
-        <Navbar isBordered>
+        <Navbar isBordered className="bg-white">
             <NavbarContent justify="start">
                 <NavbarBrand className="mr-4">
                     <Link className="flex items-center" href="/">
@@ -181,11 +137,6 @@ export default function App() {
                             </DropdownItem>
                         </DropdownMenu>
                     </Dropdown>
-                    {/* <NavbarItem>
-                        <Link color="foreground" href="#">
-                            Каталог
-                        </Link>
-                    </NavbarItem> */}
                     <NavbarItem>
                         <Link className="text-base text-gray-500 font-bold transition ease-in-out delay-100 hover:text-black duration-150" href="#">
                             Персоны
@@ -213,46 +164,7 @@ export default function App() {
                     startContent={<SearchIcon size={18} />}
                     type="search"
                 />
-                {!auth ? (<NavbarItem>
-                    <Button as={Link} color="primary" href="/auth" variant="flat">
-                        Войти
-                    </Button>
-                </NavbarItem>) : (<Dropdown placement="bottom-center">
-                    <DropdownTrigger>
-                        <User
-                            as="button"
-                            avatarProps={{
-                                isBordered: true,
-                                src: "icon_avatar1.png",
-                            }}
-                            className="transition-transform"
-                        />
-                    </DropdownTrigger>
-                    <DropdownMenu aria-label="Dynamic Actions">
-                        <DropdownItem key="me" isReadOnly className="h-12 gap-2 opacity-100">
-                            <User
-                                avatarProps={{
-                                    size: "sm",
-                                    src: "icon_avatar1.png",
-                                }}
-                                classNames={{
-                                    name: "text-default-600",
-                                    description: "text-default-500",
-                                }}
-                                name={`${username}`}
-                            />
-                        </DropdownItem>
-                        {items.map((item) => (
-                            <DropdownItem
-                                key={item.key}
-                                className={item.key === "logout" ? "text-danger" : ""}
-                                color={item.key === "logout" ? "danger" : "default"}
-                            >
-                                {item.label}
-                            </DropdownItem>
-                        ))}
-                    </DropdownMenu>
-                </Dropdown>)}
+                <ButtonNavbar />
             </NavbarContent>
         </Navbar>
     );
