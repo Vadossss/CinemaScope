@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 export default function App({ movieId, fetchData }) {
     const [commentText, setCommentText] = useState("");
     const [stateButton, setStateButton] = useState(true)
+    const [isButtonLoad, setIsButtonLoad] = useState(false);
 
     useEffect(() => {
         if (commentText.length > 0) {
@@ -18,13 +19,13 @@ export default function App({ movieId, fetchData }) {
     }, [commentText])
 
     const handlerInput = async () => {
-        console.log("Ono");
-
+        setIsButtonLoad(true);
         const body = { id: movieId, comment: commentText }
         const res = await fetchNewCommentForFilm(body);
         if (res) {
             setCommentText("");
             fetchData();
+            setIsButtonLoad(false);
         }
     }
 
@@ -42,7 +43,7 @@ export default function App({ movieId, fetchData }) {
             />
             <div className="flex justify-end">
                 <Button
-
+                    isLoading={isButtonLoad}
                     isDisabled={stateButton}
                     onPress={() => handlerInput()}
                     className="p-2 rounded bg-gray-300 text-sm font-bold">Отправить</Button>
