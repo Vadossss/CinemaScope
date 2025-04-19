@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Игнорировать папку настроек JetBrains IDE
+.idea/
+
+# Игнорировать файлы модулей проекта
+*.iml
