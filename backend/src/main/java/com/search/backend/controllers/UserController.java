@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.BindingResult;
 
+import java.util.List;
+
 /**
  * Контроллер для взаимодействия пользователя с системой.
  */
@@ -40,11 +42,11 @@ public class UserController {
         }
 
         // Передаём данные в сервис для добавления элемента в категорию
-        return userService.addItemToList(newItemToListRequest.getUserId(), newItemToListRequest.getItemId(),
+        return userService.addItemToList(newItemToListRequest.getItemId(),
                 newItemToListRequest.getCategoryName());
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_CLIENT')")
+//    @PreAuthorize("hasAnyAuthority('ROLE_CLIENT')")
     @PostMapping("/setFavoriteGenres")
     public ResponseEntity<Object> formingFavoriteUserGenres(@RequestBody FavoriteGenresRequest favoriteGenresRequest) {
         return userService.formingFavoriteUserGenres(favoriteGenresRequest.getUserId(), favoriteGenresRequest.getFavoriteGenres());
@@ -67,8 +69,28 @@ public class UserController {
         return userService.addCommentForUser(commentRequest.getId(), commentRequest.getComment());
     }
 
-    @PostMapping("/like")
-    public ResponseEntity<Object> like(@RequestBody LikeRequest likeRequest) {
-        return userService.addLikeForComment(likeRequest.getCommentId());
+    @PostMapping("/comment/{id}/like")
+    public ResponseEntity<Object> likeComment(@PathVariable String id) {
+        return userService.toggleReactionForComment(id, true);
+    }
+
+    @PostMapping("/comment/{id}/dislike")
+    public ResponseEntity<Object> dislikeComment(@PathVariable String id) {
+        return userService.toggleReactionForComment(id, false);
+    }
+
+//    @PostMapping("/likeComment")
+//    public ResponseEntity<Object> like(@RequestBody LikeRequest likeRequest) {
+//        return userService.addLikeForComment(likeRequest.getCommentId());
+//    }
+//
+//    @PostMapping("/dislikeComment")
+//    public ResponseEntity<Object> dislike(@RequestBody LikeRequest likeRequest) {
+//        return userService.addDislikeForComment(likeRequest.getCommentId());
+//    }
+
+    @GetMapping("/recommendationForUser")
+    public List<MovieMongo> rec() {
+        return userService.recommendationForUser();
     }
 }
