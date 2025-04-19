@@ -38,7 +38,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register", "/auth/login", "/auth/updateRefreshToken", "/auth/debugRoles").permitAll()
+                        .requestMatchers("/auth/register", "/auth/login", "/auth/updateRefreshToken",
+                                "/auth/debugRoles", "/films/movie", "/films/getMovieById", "/comments/getCommentsForMovie").permitAll()
                         .anyRequest().authenticated()
                 )
 
