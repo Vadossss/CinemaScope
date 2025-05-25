@@ -7,6 +7,8 @@ import { AuthProvider } from "./contexts/authContext";
 import { Amatic_SC } from "next/font/google";
 import { HeroUIProvider } from '@heroui/react'
 import { ToastProvider } from "@heroui/toast";
+import Footer from "../app/components/Footer";
+import { PlayerProvider } from 'next-playerjs-wrapper'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,15 +34,21 @@ const amatic = Amatic_SC({
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
+    <head>
+      <script src="//site.com/playerjs.js" type="text/javascript"></script>
+    </head>
+    <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
           <Navbar />
-          <HeroUIProvider>
-            <ToastProvider />
-            <div className="mt-4 flex flex-col items-center min-h-[calc(96vh-4rem)]">{children}</div>
-          </HeroUIProvider>
+          <PlayerProvider player='/playerjs.js'>
+            <HeroUIProvider>
+              <ToastProvider />
+              <div className="mt-4 flex flex-col items-center min-h-[calc(96vh-4rem)]">{children}</div>
+              <Footer />
+            </HeroUIProvider>
+          </PlayerProvider>
         </AuthProvider>
       </body>
     </html>
