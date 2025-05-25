@@ -92,6 +92,7 @@ public class MovieMongo {
 
     private Videos videos;
     private double popularity;
+    private String trailer;
 
     @Getter
     @Setter
