@@ -23,8 +23,8 @@ export const fetchWithAuth = async (url, options = {}) => {
             });
             return retryResponse;
         } else {
-            // Не удалось обновить — возможно, надо разлогинить пользователя
-            throw new Error("Unauthorized and refresh failed");
+            return false;
+            // throw new Error("Unauthorized and refresh failed");
         }
     }
 
