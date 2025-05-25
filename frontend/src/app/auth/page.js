@@ -6,7 +6,7 @@ import { Select, SelectItem } from "@heroui/react";
 
 import { Tabs, Tab, Link, Card, CardBody } from "@heroui/react";
 import { useState, useEffect } from 'react';
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../contexts/authContext";
 import { fetchLogin } from "../utils/fetchLogin"
 
@@ -78,8 +78,10 @@ export const EyeFilledIcon = (props) => {
     );
 };
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function Auth() {
-    const { auth, setAuth } = useAuth();
+    const { auth, setAuth, refreshAuth } = useAuth();
     const [selected, setSelected] = React.useState("login");
     const [action, setAction] = React.useState(null);
     const [submitted, setSubmitted] = React.useState(null);
@@ -102,6 +104,9 @@ export default function Auth() {
     const [checkBoxRegister, setCheckBoxRegister] = useState(false);
     const [isCaptcha, setCaptcha] = useState(false);
     const [errorsRegister, setErrorsRegister] = useState({ login: "", password: "", passwordSecond: "", name: "", lastName: "", email: "", checkBox: "", age: "", sex: "", status: "" });
+    const searchParams = useSearchParams();
+    const from = searchParams.get("from");
+
 
     // const [registerMessage, setRegisterMessage] = useState("");
 
@@ -187,7 +192,7 @@ export default function Auth() {
         console.log('Submitting form:', data);
 
         try {
-            const res = await fetch(`/api/register`, {
+            const res = await fetch(`${BASE_URL}/auth/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
@@ -219,46 +224,6 @@ export default function Auth() {
         }
     }
 
-    // async function handleLoginSubmit(event) {
-    //     event.preventDefault();
-    //     const formData = new FormData(event.target);
-    //     const data = Object.fromEntries(formData);
-    //     console.log('Submitting form:', data);
-
-    //     try {
-    //         const res = await fetch(source2 + `/auth/login`, {
-    //             method: "POST",
-    //             headers: { "Content-Type": "application/json" },
-    //             body: JSON.stringify(data),
-    //             credentials: "include"
-    //         });
-    //         // console.log('Submitting form:', data);
-    //         // const errorData = await res.text();
-
-    //         const dataRes = await res.json();
-
-    //         console.log(dataRes);
-
-    //         if (res.status === 200) {
-    //             router.push("/");
-    //         } else {
-    //             setLoginMessage(dataRes.error);
-    //             console.log(dataRes);
-    //         }
-
-    //         // if (res.status === 401) {
-    //         //   setLoginMessage(errorData);
-    //         // }
-    //         // if (res.ok) {
-    //         //   router.push("/dashboard");
-    //         // }
-
-    //     } catch (error) {
-    //         // setLoginMessage(error);
-    //     }
-    // }
-
-
     return (
         // <div className="flex h-screen items-center justify-center">
         <div className="flex flex-col">
@@ -275,7 +240,7 @@ export default function Auth() {
                         <Tab key="login" title="Войти" >
                             <Form
                                 className="flex flex-col gap-2"
-                                onSubmit={(e) => fetchLogin(e, { setAuth, router, setLoginMessage })}
+                                onSubmit={(e) => fetchLogin(e, { setAuth, router, setLoginMessage, refreshAuth, from })}
                                 validationBehavior="native"
                             >
                                 <Input
@@ -332,7 +297,7 @@ export default function Auth() {
                                 <Input
                                     isRequired
                                     label="Логин"
-                                    name="login"
+                                    name="username"
                                     placeholder="Введите свой Логин"
                                     type="text"
                                     validate={() => {
