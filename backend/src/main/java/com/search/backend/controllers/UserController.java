@@ -79,16 +79,6 @@ public class UserController {
         return userService.toggleReactionForComment(id, false);
     }
 
-//    @PostMapping("/likeComment")
-//    public ResponseEntity<Object> like(@RequestBody LikeRequest likeRequest) {
-//        return userService.addLikeForComment(likeRequest.getCommentId());
-//    }
-//
-//    @PostMapping("/dislikeComment")
-//    public ResponseEntity<Object> dislike(@RequestBody LikeRequest likeRequest) {
-//        return userService.addDislikeForComment(likeRequest.getCommentId());
-//    }
-
     @GetMapping("/recommendationForUser")
     public List<MovieMongo> rec() {
         return userService.recommendationForUser();
