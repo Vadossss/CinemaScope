@@ -4,7 +4,9 @@ import com.search.backend.models.AppUser;
 import com.search.backend.models.LoginRequest;
 import com.search.backend.models.SetRoleRequest;
 import com.search.backend.services.AuthService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -33,6 +35,30 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody AppUser user) {
         return authService.registerUser(user);
+    }
+
+    @PostMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        // Очистка куки с токеном
+        Cookie cookie = new Cookie("accessToken", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);  // Только по https
+        cookie.setPath("/");  // Применяется ко всем путям
+        cookie.setMaxAge(0);  // Устанавливаем срок действия куки в 0 (удаление)
+        response.addCookie(cookie);
+
+        Cookie cookier = new Cookie("refreshToken", null);
+        cookier.setHttpOnly(true);
+        cookier.setSecure(true);  // Только по https
+        cookier.setPath("/");  // Применяется ко всем путям
+        cookier.setMaxAge(0);  // Устанавливаем срок действия куки в 0 (удаление)
+        response.addCookie(cookier);
+
+        // Инвалидируем сессию
+        request.getSession().invalidate();
+
+        // Перенаправляем на страницу логина
+        return "redirect:/login";
     }
 
     @PostMapping("/updateRefreshToken")
