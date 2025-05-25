@@ -37,7 +37,7 @@ const items = [
 let source = "http://localhost:8085";
 
 export default function App() {
-    const { auth, username } = useAuth();
+    const { auth, username, setAuth } = useAuth();
     const [isLoading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -45,6 +45,13 @@ export default function App() {
             setLoading(false);
         }
     }, [auth]);
+
+    const handleLogout = async () => {
+        await fetch('http://localhost:8085/auth/logout', { method: 'POST', credentials: "include" });
+        setAuth(false);
+        // После выхода обновляем интерфейс, например, перенаправляем на страницу логина
+        // window.location.href = '/login';
+    };
 
     if (isLoading) {
         return (
@@ -90,6 +97,7 @@ export default function App() {
                             key={item.key}
                             className={item.key === "logout" ? "text-danger" : ""}
                             color={item.key === "logout" ? "danger" : "default"}
+                            onPress={() => handleLogout()}
                         >
                             {item.label}
                         </DropdownItem>
