@@ -29,23 +29,75 @@ export default function App() {
 
     }, [])
 
+    // useEffect(() => {
+    //
+    //     const script = document.createElement('script');
+    //     script.src = '//kinoplayer.top/top.js';
+    //     script.async = true;
+    //     document.getElementById('kinoplayertop')?.appendChild(script);
+    //
+    // }, []);
+
+    useEffect(() => {
+
+        const script = document.createElement('script');
+        script.src = '//yohoho.cc/yo.js';
+        script.async = true;
+        document.getElementById('yohoho')?.appendChild(script);
+
+    }, []);
+
+        const playerHTML = `
+    <div id="player"></div>
+    <script>
+      var player = new Playerjs({
+        id:"player",
+        file:"https://www.youtube.com/watch?v=uSdqkFAiJkQ&ab_channel=%D0%A1%D0%B5%D1%80%D0%B3%D0%B5%D0%B9%D0%9E%D1%80%D0%BB%D0%BE%D0%B2"
+      });
+    </script>
+  `;
+
+
     if (isLoading) {
         return (
             <div>Загрузка</div>
         )
     }
+    console.log(filmData)
 
     return (
         <div className="flex bg-white pt-5 pb-5 rounded justify-center">
             <main>
                 <div className="flex flex-col w-[1280px]">
                     <div className="flex mr-16 ml-16 gap-10">
-                        <div className="flex flex-col">
+                        <div className="flex flex-col gap-4">
                             <div>
-                                <img className="w-[302px] rounded" src={filmData.poster.url}></img>
+                                <img className="w-[400px] rounded" src={filmData.poster.url}></img>
                             </div>
                             <div>
                                 {/* <video controls autoPlay muted playsInline src="https://disk.yandex.ru/i/fN22N7ErD_POWg"></video> */}
+                                {/*<div id="kinoplayertop" data-kinopoisk="1301710"></div>*/}
+                                {filmData.trailer && (
+                                    <div>
+                                        <iframe
+                                            className="rounded w-[315px] h-[200px]"
+                                            src={filmData.trailer}
+
+                                            title="YouTube video player" frameBorder="0"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; web-share"
+                                            referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
+                                        {/*<div className="plyr__video-embed" id="player">*/}
+                                        {/*    <iframe*/}
+                                        {/*        className="rounded"*/}
+                                        {/*        src={`${filmData.trailer}?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;controls=0;showinfo=1&amp;rel=0&amp;enablejsapi=1`}*/}
+                                        {/*        // allowFullScreen*/}
+                                        {/*        // allowTransparency*/}
+                                        {/*        allow="autoplay"*/}
+                                        {/*    ></iframe>*/}
+                                        {/*</div>*/}
+
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="flex flex-col w-[840px]">
@@ -54,9 +106,9 @@ export default function App() {
                         </div>
 
                     </div>
-                    <Comments id={filmData.id} />
+                    <Comments id={filmData.id}/>
                 </div>
-            </main >
-        </div >
+            </main>
+        </div>
     )
 }
