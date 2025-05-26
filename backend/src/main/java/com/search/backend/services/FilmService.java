@@ -51,6 +51,12 @@ public class FilmService {
         return mongoTemplate.find(query, MovieMongo.class);
     }
 
+    public List<MovieMongo> searchByRegex(String regex) {
+        Criteria criteria = Criteria.where("name").regex(regex, "i");
+        Query query = new Query(criteria).limit(50);
+        return mongoTemplate.find(query, MovieMongo.class);
+    }
+
     public ResponseEntity<Object> getMovieById(Long id) {
         MovieMongo movie =  mongoTemplate.findById(id, MovieMongo.class);
         if (movie == null) {
