@@ -39,7 +39,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/register", "/auth/login", "/auth/updateRefreshToken",
-                                "/auth/debugRoles", "/films/movie", "/films/getMovieById", "/comments/getCommentsForMovie").permitAll()
+                                "/auth/debugRoles", "/films/movie", "/films/getMovieById",
+                                "/comments/getCommentsForMovie", "films/popularNow", "/films/findByRegex").permitAll()
                         .anyRequest().authenticated()
                 )
 
