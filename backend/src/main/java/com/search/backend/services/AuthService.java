@@ -112,9 +112,9 @@ public class AuthService {
                     user.getPassword())) {
                 return generateAuthResponse(user.getUsername());
             }
-            return ResponseEntity.status(401).body("Username or password is incorrect");
+            return ResponseEntity.status(401).body("Неверный логин или пароль");
         }
-        return ResponseEntity.status(401).body("Username or password is incorrect");
+        return ResponseEntity.status(401).body("Неверный логин или пароль");
     }
 
     public ResponseEntity<Object> updateRefreshToken(HttpServletRequest request) {
