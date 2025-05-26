@@ -12,7 +12,14 @@ export async function fetchLogin(event, { setAuth, router, setLoginMessage, refr
             credentials: "include"
         });
 
-        const dataRes = await res.json();
+        const contentType = res.headers.get("content-type");
+        let dataRes;
+
+        if (contentType && contentType.includes("application/json")) {
+            dataRes = await res.json();
+        } else {
+            dataRes = await res.text();
+        }
 
         console.log(dataRes);
 
@@ -21,10 +28,14 @@ export async function fetchLogin(event, { setAuth, router, setLoginMessage, refr
             router.push(from || "/");
             setAuth(true);
         } else {
-            setLoginMessage(dataRes.error);
-            console.log(dataRes);
+            setLoginMessage(
+                typeof dataRes === "string"
+                    ? dataRes
+                    : "Неверный логин или пароль"
+            );
         }
     } catch (error) {
-        // setLoginMessage(error);
+        console.error("Ошибка при логине:", error.message);
+        setLoginMessage("Произошла ошибка при соединении с сервером");
     }
 }
