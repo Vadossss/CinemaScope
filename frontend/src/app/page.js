@@ -1,27 +1,73 @@
 "use client"
 
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import RecommendationSwiper from "@/app/components/RecommendationSwiper";
 import PopularMovieSwiper from "@/app/components/PopularMovieSwiper";
+import {useAuth} from "@/app/contexts/authContext";
+import {Spinner} from "@heroui/react";
+import {fetchPopularMovie} from "@/app/utils/fetchPopularMovie";
+import {fetchWithAuth} from "@/app/utils/fetchWithAuth";
 
 export default function Home() {
-  const [data, setData] = useState(null);
-  const [isLoading, setLoading] = useState(true);
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
-  myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ2bGFkeWthIiwiZXhwIjoxNzQzMjExNDU5fQ.8p_HDbo-lAu6kXHchy1W8Jljq0Sg_tVx1bWpIeBfs70");
-  myHeaders.append("Cookie", "accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ2bGFkeWthIiwiZXhwIjoxNzQzOTg5MDc3fQ.XBVdU01HHvp9O5TtvcbbfBaWuhuTE6eYR4Mj2Fl2L68; refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ2bGFkeWthIiwiZXhwIjoxNzUxNzY0MTc3fQ.TIKbkCahnNae8OVgk_ZH9NSseO3zfTFoP4qdhlpj3PQ");
+  const [isLoadingPopular, setLoadingPopular] = useState(true);
+  const [isLoadingRecommendation, setLoadingRecommendation] = useState(true);
+  const [moviePopularData, setMoviePopularData] = useState(null);
+  const [movieRecommendationData, setMovieRecommendationData] = useState(null);
+  const { auth } = useAuth();
 
-  if (isLoading && data !== null) {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const [result, isLoading] = await fetchPopularMovie();
+      console.log(result);
+      setMoviePopularData(result);
+      setLoadingPopular(false);
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetchWithAuth("/user/userPersonalCatalog?page=1&size=250",
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json"
+            },
+          });
+      if (res.ok) {
+        const data = await res.json();
+        console.log(data);
+        setMovieRecommendationData(data.data)
+        setLoadingRecommendation(false);
+      }
+      else {
+        setMovieRecommendationData(null);
+        setLoadingRecommendation(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (isLoadingPopular || isLoadingRecommendation) {
     return (
-      <div>Загрузка </div>
+        <div className="w-[1600px] h-screen bg-white flex justify-center items-center">
+          <Spinner color="default" />
+        </div>
     )
   }
 
   return (
-    <div className="max-w-[1504px] bg-white">
-      <PopularMovieSwiper />
-      <RecommendationSwiper />
+    <div className="w-[1600px] bg-white flex flex-col items-center rounded gap-4 min-h-screen pt-8">
+      <PopularMovieSwiper movieData={moviePopularData} />
+      {auth && <RecommendationSwiper movieData={movieRecommendationData} />}
+      {/*<RecommendationSwiper />*/}
     </div>
   );
 }
