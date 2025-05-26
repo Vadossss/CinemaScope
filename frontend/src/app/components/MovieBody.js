@@ -29,11 +29,31 @@ export default function App({ filmData }) {
         });
     };
 
+    const pluralizeMinutes = (num) => {
+        const lastDigit = num % 10;
+        const lastTwoDigits = num % 100;
+
+        if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+            return `${num} минут`;
+        }
+
+        if (lastDigit === 1) {
+            return `${num} минута`;
+        }
+
+        if (lastDigit >= 2 && lastDigit <= 4) {
+            return `${num} минуты`;
+        }
+
+        return `${num} минут`;
+    };
+
     const categories = [
         { name: "Год производства", value: filmData?.year },
         { name: "Страна", value: filmData?.countries?.[0]?.name },
         { name: "Жанр", value: filmData?.genres?.map(g => g.name).join(', ') },
         { name: "Слоган", value: filmData?.slogan },
+        { name: "Длина серии", value: filmData?.seriesLength != null ? pluralizeMinutes(filmData.seriesLength) : null },
         { name: "Режиссер", value: formatPersons("режиссеры", "director") },
         { name: "Сценарий", value: formatPersons("сценаристы", "writer") },
         { name: "Продюсер", value: formatPersons("продюсеры", "producer") },
