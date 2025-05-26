@@ -1,9 +1,9 @@
+"use client"
+
 import Link from "next/link";
 import { fetchAddWishlist } from "../utils/fetchAddWishlist";
-import { addToast, Button } from "@heroui/react";
 
 export default function App({ data }) {
-
 
     const ratingColor = data.rating.kp > 7.1 ? "#3bb33b" : data.rating.kp > 4.1 ? "#777" : "#ff1414";
 
