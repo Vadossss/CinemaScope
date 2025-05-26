@@ -126,8 +126,8 @@ export default function Auth() {
     }, [auth])
 
     useEffect(() => {
-        let loginError = login.length < 6 ? "Логин должен содержать минимум 6 символов" : "";
-        let passwordError = passwordLogin.length < 8 ? "Пароль должен содержать минимум 8 символов" : "";
+        let loginError = login.length < 3 ? "Логин должен содержать минимум 6 символов" : "";
+        let passwordError = passwordLogin.length < 6 ? "Пароль должен содержать минимум 8 символов" : "";
 
         setErrors({ login: loginError, password: passwordError });
         setRegisterMessage("");
