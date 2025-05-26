@@ -27,7 +27,7 @@ export default function App({ id }) {
     }
 
     return (
-        <div className="flex flex-col gap-4 mr-16 ml-16">
+        <div className="flex flex-col gap-4">
             <h1>Комментарии {comments.length}</h1>
             <InputComment movieId={id} fetchData={fetchData} />
             {comments.length > 0 ? (

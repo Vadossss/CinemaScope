@@ -83,7 +83,7 @@ export default function App() {
                         <User
                             avatarProps={{
                                 size: "sm",
-                                src: "icon_avatar1.png",
+                                src: "/icon_avatar1.png",
                             }}
                             classNames={{
                                 name: "text-default-600",
