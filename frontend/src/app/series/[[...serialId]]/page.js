@@ -1,5 +1,9 @@
+import SeriesPage from "@/app/components/SeriesPage";
+
 export default function App() {
     return (
-        <div>Страница сериала</div>
+        <div>
+            <SeriesPage/>
+        </div>
     )
 }
