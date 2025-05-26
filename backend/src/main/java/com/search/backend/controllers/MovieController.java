@@ -30,7 +30,7 @@ public class MovieController {
 
     @GetMapping("/save")
     public void saveExampleMovie() throws IOException {
-        for (int page = 1; page <= 2; page++) {
+        for (int page = 1; page <= 250; page++) {
             String jo = filmService.getFilms(page);
             JsonNode js = (new ObjectMapper()).readTree(jo);
             for (JsonNode j : js.path("docs")) {
@@ -54,6 +54,11 @@ public class MovieController {
     @GetMapping("/findByNameRegex")
     public List<MovieMongo> findNameRegex(@RequestParam String name, @RequestParam(defaultValue = "10") int limit) {
         return filmService.searchByNameRegex(name, limit);
+    }
+
+    @GetMapping("/findByRegex")
+    public List<MovieMongo> getSearchByRegex(@RequestParam String regex) {
+        return filmService.searchByRegex(regex);
     }
 
     @PostMapping("/getSearchFilms")
