@@ -138,7 +138,7 @@ export default function App() {
                         </DropdownMenu>
                     </Dropdown>
                     <NavbarItem>
-                        <Link className="text-base text-gray-500 font-bold transition ease-in-out delay-100 hover:text-black duration-150" href="#">
+                        <Link className="text-base text-gray-500 font-bold transition ease-in-out delay-100 hover:text-black duration-150" href="/persons">
                             Персоны
                         </Link>
                     </NavbarItem>
