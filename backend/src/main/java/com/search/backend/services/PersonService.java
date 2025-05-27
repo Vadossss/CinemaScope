@@ -1,0 +1,40 @@
+package com.search.backend.services;
+
+import com.search.backend.repositories.UserMongoRepository;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+
+@Service
+public class PersonService {
+    @Value("${KINO_API_KEY}")
+    private String kinoApiKey;
+
+    public String getPersons(int page) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+//                .url("https://api.kinopoisk.dev/v1.4/movie?page=1&limit=250&selectFields=&type=movie&rating.kp=7-10")
+                .url(String.format("https://api.kinopoisk.dev/v1.4/person?page=%d&limit=250&selectFields=id&selectFields=name&" +
+                        "selectFields=enName&selectFields=photo&selectFields=sex&selectFields=growth&selectFields=birthday" +
+                        "&selectFields=death&selectFields=age&selectFields=birthPlace&selectFields=deathPlace&selectFields=spouses" +
+                        "&selectFields=countAwards&selectFields=profession&selectFields=facts&selectFields=movies", page))
+                .get()
+                .addHeader("accept", "application/json")
+                .addHeader("X-API-KEY", kinoApiKey)
+                .build();
+
+        Response response;
+        try {
+            response = client.newCall(request).execute();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return response.body().string();
+    }
+}
