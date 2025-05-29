@@ -40,7 +40,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/register", "/auth/login", "/auth/updateRefreshToken",
                                 "/auth/debugRoles", "/films/movie", "/films/getMovieById",
-                                "/comments/getCommentsForMovie", "films/popularNow", "/films/findByRegex", "/person/getPersons").permitAll()
+                                "/comments/getCommentsForMovie", "films/popularNow", "/films/findByRegex",
+                                "/person/getPersons", "/person/findPersonByID").permitAll()
                         .anyRequest().authenticated()
                 )
 
