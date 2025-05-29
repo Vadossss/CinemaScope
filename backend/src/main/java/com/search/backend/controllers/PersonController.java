@@ -8,6 +8,7 @@ import com.search.backend.repositories.PersonRepositoryMongo;
 import com.search.backend.services.PersonService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 
@@ -52,6 +53,13 @@ public class PersonController {
         Pageable pageable = PageRequest.of(page, size);
         return personRepository.findAll(pageable);
     }
+
+    @GetMapping("/findPersonByID")
+    public ResponseEntity<Object> getMovie(@RequestParam Long id) {
+        return personService.getPersonByID(id);
+    }
+
+
 
 
 }
