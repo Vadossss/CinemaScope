@@ -1,11 +1,14 @@
 package com.search.backend.services;
 
+import com.search.backend.models.MovieMongo;
+import com.search.backend.models.PersonMongo;
 import com.search.backend.repositories.UserMongoRepository;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -14,6 +17,12 @@ import java.io.IOException;
 public class PersonService {
     @Value("${KINO_API_KEY}")
     private String kinoApiKey;
+    private final MongoTemplate mongoTemplate;
+
+    public PersonService(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
+
 
     public String getPersons(int page) throws IOException {
         OkHttpClient client = new OkHttpClient();
@@ -36,5 +45,13 @@ public class PersonService {
             throw new RuntimeException(e);
         }
         return response.body().string();
+    }
+
+    public ResponseEntity<Object> getPersonByID(Long id) {
+        PersonMongo person = mongoTemplate.findById(id, PersonMongo.class);
+        if (person == null) {
+            return ResponseEntity.status(404).body("Person not found");
+        }
+        return ResponseEntity.ok(person);
     }
 }
