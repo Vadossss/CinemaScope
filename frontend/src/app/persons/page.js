@@ -65,11 +65,10 @@ export default function PersonsPage() {
             className="bg-white rounded-xl shadow p-4 flex flex-col items-center text-center"
           >
             <img
-                src={(person.photo || "https://avatars.mds.yandex.net/get-entity_search/1595090/1152594441/S600xU_2x").replace("https:https://", "https://")}
+                src={(person.photo || "/base_poster.svg").replace("https:https://", "https://")}
                 alt={person.name}
                   className="w-24 h-24 object-cover rounded-md mb-3 border border-red-500"
             />
-            console.log(person.photo)
             <h2 className="font-semibold text-lg mb-1">
               {person.name || person.enName}
             </h2>
