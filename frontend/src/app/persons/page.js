@@ -1,30 +1,40 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getPersons } from "../utils/fetchAllPersons";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 export default function PersonsPage() {
   const [persons, setPersons] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const params = useParams();
+  const personId = params.personId;
+
+
+ 
 
   useEffect(() => {
-    fetch(`http://localhost:8085/person/getPersons?page=${page}&size=15`)
-      .then(async (res) => {
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(`Ошибка сервера: ${res.status} - ${text}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setPersons(data.content);
-        setTotalPages(data.totalPages);
-      })
-      .catch((err) => {
-        console.error("Ошибка при получении персон:", err);
-        alert(err.message);
-      });
+    async function fetchData() {
+      const [data, error] = await getPersons(page);
+
+      if (error) {
+        console.error("Ошибка при получении персон:", error);
+        alert("Ошибка при загрузке персон");
+        return;
+      }
+
+      if (data) {
+        setPersons(data.content || []);
+        setTotalPages(data.totalPages || 0);
+      }
+    }
+
+    fetchData();
   }, [page]);
+
+  
 
   // Пагинация с максимум 10 кнопок (как раньше)
   const getPageNumbers = () => {
@@ -57,26 +67,27 @@ export default function PersonsPage() {
     <div className="p-6">
       <h1 className="text-3xl font-bold mb-6">Персоны</h1>
 
-      {/* Сетка 5 колонок с карточками актёров */}
+      {/* Сетка 15 колонок с карточками актёров */}
       <div className="grid grid-cols-5 gap-6">
         {persons.map((person) => (
-          <div
-            key={person.id}
-            className="bg-white rounded-xl shadow p-4 flex flex-col items-center text-center"
-          >
-            <img
+            <Link key={person.id} href={`/persons/person?id=${person.id}`} passHref>
+            <div
+              className="bg-white rounded-xl shadow p-4 flex flex-col items-center text-center cursor-pointer hover:shadow-lg transition"
+            >
+              <img
                 src={(person.photo || "/base_poster.svg").replace("https:https://", "https://")}
                 alt={person.name}
-                  className="w-24 h-24 object-cover rounded-md mb-3 border border-red-500"
-            />
-            <h2 className="font-semibold text-lg mb-1">
-              {person.name || person.enName}
-            </h2>
-            <p className="text-sm text-gray-600 mb-1">Возраст: {person.age || "—"}</p>
-            <p className="text-sm text-gray-500">
-              {person.profession?.map((p) => p.value).join(", ") || "Профессии не указаны"}
-            </p>
-          </div>
+                className="w-24 h-24 object-cover rounded-md mb-3 border border-red-500"
+              />
+              <h2 className="font-semibold text-lg mb-1">
+                {person.name || person.enName}
+              </h2>
+              <p className="text-sm text-gray-600 mb-1">Возраст: {person.age || "—"}</p>
+              <p className="text-sm text-gray-500">
+                {person.profession?.map((p) => p.value).join(", ") || "Профессии не указаны"}
+              </p>
+            </div>
+          </Link>
         ))}
       </div>
 
