@@ -55,7 +55,8 @@ public class PersonController {
     }
 
     @GetMapping("/findPersonByID")
-    public ResponseEntity<Object> getMovie(@RequestParam Long id) {
+    public ResponseEntity<Object> getPersonByID(@RequestParam Long id) {
+        System.out.println(id);
         return personService.getPersonByID(id);
     }
 
