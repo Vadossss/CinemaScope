@@ -44,25 +44,25 @@ export default function PersonPage() {
   if (error) return <div style={{ color: "red" }}>Ошибка: {error}</div>;
   if (!person) return <div>Персона не найдена</div>;
 
-  return (
-    <div className="min-h-screen w-full p-6 bg-gray-50">
-      <div className="w-full bg-white rounded shadow p-6 flex flex-col gap-6">
+    return (
+    <div className="min-h-screen w-full bg-gray-50 py-6 px-4">
+        <div className="max-w-screen-xl mx-auto bg-white rounded shadow p-6 flex flex-col gap-6">
         {/* Секция информации */}
         <div className="flex flex-col md:flex-row gap-6">
-          {/* Левая часть (фото и имя) */}
-          <div className="w-full md:w-1/3">
+            {/* Левая часть (фото и имя) */}
+            <div className="w-full md:w-1/3">
             <PersonHeader person={person} />
-          </div>
+            </div>
 
-          {/* Правая часть (данные) */}
-          <div className="w-full md:w-2/3">
+            {/* Правая часть (данные) */}
+            <div className="w-full md:w-2/3">
             <PersonBody person={person} />
-          </div>
+            </div>
         </div>
 
         {/* Фильмы */}
         <PersonMovieList movies={person.movies} />
-      </div>
+        </div>
     </div>
-  );
+    );
 }
