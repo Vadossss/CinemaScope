@@ -2,6 +2,8 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+
 
 import PersonHeader from "./PersonHeader";
 import PersonBody from "./PersonBody";
@@ -9,8 +11,8 @@ import PersonMovieList from "./PersonMovieList";
 import { fetchGetPersonByID } from "../utils/fetchGetPersonByID";
 
 export default function PersonPage() {
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  const params = useParams();
+  const id = params.id; // теперь id из сегмента пути /persons/[id]
 
   const [person, setPerson] = useState(null);
   const [loading, setLoading] = useState(true);
