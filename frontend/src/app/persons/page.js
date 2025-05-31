@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getPersons } from "../utils/fetchAllPersons";
+import { getPersons } from "@/app/utils/fetchAllPersons";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -70,7 +70,7 @@ export default function PersonsPage() {
       {/* Сетка 15 колонок с карточками актёров */}
       <div className="grid grid-cols-5 gap-6">
         {persons.map((person) => (
-            <Link key={person.id} href={`/persons/person?id=${person.id}`} passHref>
+            <Link key={person.id} href={`/persons/${person.id}`} passHref>
             <div
               className="bg-white rounded-xl shadow p-4 flex flex-col items-center text-center cursor-pointer hover:shadow-lg transition"
             >
