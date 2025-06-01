@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -44,6 +45,11 @@ public class UserController {
         // Передаём данные в сервис для добавления элемента в категорию
         return userService.addItemToList(newItemToListRequest.getItemId(),
                 newItemToListRequest.getCategoryName());
+    }
+
+    @GetMapping("/getUserProfile")
+    public ResponseEntity<Object> getUserProfile(@RequestParam String userId) {
+        return userService.getUserProfile(userId);
     }
 
 //    @PreAuthorize("hasAnyAuthority('ROLE_CLIENT')")
@@ -83,4 +89,9 @@ public class UserController {
     public List<MovieMongo> rec() {
         return userService.recommendationForUser();
     }
+
+//    @PostMapping("/uploadPhoto")
+//    public ResponseEntity<Object> uploadPhoto(@RequestParam("file") MultipartFile file) {
+//        return userService.uploadPhoto(file);
+//    }
 }
