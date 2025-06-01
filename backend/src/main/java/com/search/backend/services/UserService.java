@@ -3,7 +3,9 @@ package com.search.backend.services;
 import com.mongodb.client.result.UpdateResult;
 import com.search.backend.models.*;
 import com.search.backend.repositories.CommentRepository;
+import com.search.backend.repositories.MovieRepositoryMongo;
 import com.search.backend.repositories.UserMongoRepository;
+import com.search.backend.repositories.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,10 +19,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Сервис для взаимодействия пользователя с системой
@@ -28,26 +33,100 @@ import java.util.*;
 @Service
 public class UserService {
 
+    private final UserRepository userRepository;
     private final UserMongoRepository userMongoRepository;
     private final FilmService filmService;
     private final MongoTemplate mongoTemplate;
     private final CommentRepository commentRepository;
+    private final MovieRepositoryMongo movieRepository;
 
     /**
      * Конструктор сервиса пользователя
      * @param userMongoRepository Репозиторий для работы с пользователем в MongoDB.
      */
 
-    public UserService(UserMongoRepository userMongoRepository, FilmService filmService, MongoTemplate mongoTemplate, CommentRepository commentRepository) {
+    public UserService(UserRepository userRepository, UserMongoRepository userMongoRepository, FilmService filmService, MongoTemplate mongoTemplate, CommentRepository commentRepository, MovieRepositoryMongo movieRepository) {
+        this.userRepository = userRepository;
         this.userMongoRepository = userMongoRepository;
         this.filmService = filmService;
         this.mongoTemplate = mongoTemplate;
         this.commentRepository = commentRepository;
+        this.movieRepository = movieRepository;
     }
 
     public UserDetails getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (UserDetails) authentication.getPrincipal();
+    }
+
+    public ResponseEntity<Object> getUserProfile(String userId) {
+        Optional<UserMongo> userOptional = userMongoRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(404).body("Мы не нашли такую персону :(");
+        }
+
+        UserMongo user = userOptional.get();
+
+        Set<Long> allMovieIds = new HashSet<>();
+
+        // Добавляем фильмы из категорий
+        user.getCategories().forEach((category, ids) -> {
+            ids.stream()
+                    .map(Long::valueOf)
+                    .forEach(allMovieIds::add);
+        });
+
+        // Добавляем фильмы из оценок
+        allMovieIds.addAll(user.getScores().keySet());
+
+        // Шаг 2: получить фильмы из базы
+        List<MovieMongo> movies = movieRepository.findAllById(allMovieIds);
+
+        // Шаг 3: создать Map<ID, Movie> для быстрого доступа
+        Map<Long, MovieMongo> movieMap = movies.stream()
+                .collect(Collectors.toMap(MovieMongo::getId, Function.identity()));
+
+        // Шаг 4: разбираем фильмы по категориям
+        Map<String, List<MovieMongo>> categorizedMovies = new HashMap<>();
+        user.getCategories().forEach((category, idStrings) -> {
+            List<MovieMongo> categoryMovies = idStrings.stream()
+                    .map(idStr -> {
+                        try {
+                            return Long.valueOf(idStr); // преобразуем String в Long
+                        } catch (NumberFormatException e) {
+                            return null; // или логируй ошибку
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .map(movieMap::get) // ищем по Long
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+
+            categorizedMovies.put(category, categoryMovies);
+        });
+
+        // Шаг 5: собираем фильмы с оценками
+        List<Map<String, Object>> scoredMovies = user.getScores().entrySet().stream()
+                .map(entry -> {
+                    MovieMongo movie = movieMap.get(entry.getKey());
+                    if (movie == null) return null;
+
+                    return Map.of(
+                            "movie", movie,
+                            "scoreData", entry.getValue()
+                    );
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        // Шаг 6: собрать финальный ответ
+        Map<String, Object> response = new HashMap<>();
+        response.put("user", user.getUsername());
+        response.put("favoriteGenres", user.getFavoriteGenres());
+        response.put("categorizedMovies", categorizedMovies);
+        response.put("scoredMovies", scoredMovies);
+
+        return ResponseEntity.ok(response);
     }
 
     public List<MovieMongo> recommendationForUser() {
@@ -66,14 +145,14 @@ public class UserService {
         if (userMongo == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        Map<Long, Integer> scores = userMongo.getScores();
+        Map<Long, UserMongo.Score> scores = userMongo.getScores();
         Query query = new Query(Criteria.where("_id").is(id));
         if (scores.containsKey(id)) {
             Update update = new Update()
-                    .set("rating.rate", calculateOldRating(id, score, scores.get(id)));
+                    .set("rating.rate", calculateOldRating(id, score, scores.get(id).getScore()));
             mongoTemplate.updateFirst(query, update, MovieMongo.class);
             scores.remove(id);
-            scores.put(id, score);
+            scores.put(id, new UserMongo.Score(score));
             userMongo.setScores(scores);
             userMongoRepository.save(userMongo);
             return ResponseEntity.ok().body("Оценка обновлена");
@@ -84,7 +163,7 @@ public class UserService {
                     .set("rating.rate", calculateNewRating(id, score));
 
             mongoTemplate.updateFirst(query, update, MovieMongo.class);
-            scores.put(id, score);
+            scores.put(id, new UserMongo.Score(score));
             userMongo.setScores(scores);
             userMongoRepository.save(userMongo);
             return ResponseEntity.ok().body("Оценка добавлена");
@@ -163,6 +242,24 @@ public class UserService {
 
         return ResponseEntity.ok(response);
     }
+
+//    public ResponseEntity<Object> uploadPhoto(MultipartFile file) {
+//        UserDetails userDetails = getCurrentUser();
+//        AppUser user = userRepository.findByUsername(userDetails.getUsername());
+//
+//        if (user == null) {
+//            return ResponseEntity.status(404).body("Пользователь не найден");
+//        }
+//
+//        try {
+//            user.setPhoto(file.getBytes());
+//            userRepository.save(user);
+//
+//            return ResponseEntity.ok("Фото успешно загружено");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body("Ошибка загрузки фото");
+//        }
+//    }
 
 
 //    public ResponseEntity<Object> addLikeForComment(String commentId) {
@@ -298,7 +395,6 @@ public class UserService {
      * Если элемент уже находится в добавляемой категории, то возвращаем ошибку.
      * Перед добавлением элемент удаляется из всех других категорий.
      *
-     * @param userId ID пользователя.
      * @param itemId ID элемента, который добавляем в категорию.
      * @param categoryName Название категории, в которую добавляем элемент.
      * @return Возвращает HTTP-ответ со статусом и пояснением к статусу
