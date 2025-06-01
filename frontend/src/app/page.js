@@ -78,8 +78,8 @@ export default function Home() {
 
   if (isLoadingPopular || isLoadingRecommendation) {
     return (
-        <div className="w-[1600px] h-screen bg-white flex justify-center items-center">
-          <Spinner color="default" />
+        <div className="w-[1600px] h-screen bg-white flex justify-center rounded items-center">
+          <Spinner color="warning" />
         </div>
     )
   }
