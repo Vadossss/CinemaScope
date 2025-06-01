@@ -29,15 +29,6 @@ export default function App() {
 
     }, [])
 
-    useEffect(() => {
-
-        const script = document.createElement('script');
-        script.src = '//yohoho.cc/yo.js';
-        script.async = true;
-        document.getElementById('yohoho')?.appendChild(script);
-
-    }, []);
-
     if (isLoading) {
         return (
             <div>Загрузка</div>
@@ -46,7 +37,7 @@ export default function App() {
     console.log(filmData)
 
     return (
-        <div className="flex bg-white pt-5 pb-5 rounded justify-center">
+        <div className="w-[1504px] flex bg-white pt-5 pb-5 rounded justify-center">
             <main>
                 <div className="flex flex-col w-[1280px]">
                     <div className="flex mr-16 ml-16 gap-10">
