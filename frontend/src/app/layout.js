@@ -8,14 +8,14 @@ import { Amatic_SC } from "next/font/google";
 import { HeroUIProvider } from '@heroui/react'
 import { ToastProvider } from "@heroui/toast";
 import Footer from "../app/components/Footer";
-import { PlayerProvider } from 'next-playerjs-wrapper'
+import { PlayerProvider } from 'next-playerjs-wrapper';
 import {
   useQuery,
   useMutation,
   useQueryClient,
   QueryClient,
   QueryClientProvider,
-} from '@tanstack/react-query'
+} from '@tanstack/react-query';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
