@@ -1,11 +1,16 @@
 package com.search.backend.services;
 
 import ch.qos.logback.core.net.server.Client;
+import com.search.backend.models.NewsMongo;
+import com.search.backend.models.PersonMongo;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -41,6 +46,17 @@ public class NewsService {
 
 
 
+    }
+
+    public ResponseEntity<Object> getNewsByKinopoiskId(Long kinopoiskId) {
+        Query query = new Query(Criteria.where("kinopoiskId").is(kinopoiskId));
+        NewsMongo news = mongoTemplate.findOne(query, NewsMongo.class);
+
+        if (news == null) {
+            return ResponseEntity.status(404).body("Новость с таким Id не найдена");
+        }
+
+        return ResponseEntity.ok(news);
     }
 
 }
