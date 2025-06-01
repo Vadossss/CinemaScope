@@ -5,7 +5,6 @@ import com.search.backend.models.*;
 import com.search.backend.repositories.CommentRepository;
 import com.search.backend.repositories.MovieRepositoryMongo;
 import com.search.backend.repositories.UserMongoRepository;
-import com.search.backend.repositories.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,8 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -33,7 +31,6 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
     private final UserMongoRepository userMongoRepository;
     private final FilmService filmService;
     private final MongoTemplate mongoTemplate;
@@ -45,8 +42,7 @@ public class UserService {
      * @param userMongoRepository Репозиторий для работы с пользователем в MongoDB.
      */
 
-    public UserService(UserRepository userRepository, UserMongoRepository userMongoRepository, FilmService filmService, MongoTemplate mongoTemplate, CommentRepository commentRepository, MovieRepositoryMongo movieRepository) {
-        this.userRepository = userRepository;
+    public UserService(UserMongoRepository userMongoRepository, FilmService filmService, MongoTemplate mongoTemplate, CommentRepository commentRepository, MovieRepositoryMongo movieRepository) {
         this.userMongoRepository = userMongoRepository;
         this.filmService = filmService;
         this.mongoTemplate = mongoTemplate;
@@ -70,42 +66,40 @@ public class UserService {
         Set<Long> allMovieIds = new HashSet<>();
 
         // Добавляем фильмы из категорий
-        user.getCategories().forEach((category, ids) -> {
-            ids.stream()
-                    .map(Long::valueOf)
-                    .forEach(allMovieIds::add);
-        });
+        user.getCategories().forEach((category, ids) -> ids.stream()
+                .map(Long::valueOf)
+                .forEach(allMovieIds::add));
 
         // Добавляем фильмы из оценок
         allMovieIds.addAll(user.getScores().keySet());
 
-        // Шаг 2: получить фильмы из базы
+        // Получаем фильмы из базы
         List<MovieMongo> movies = movieRepository.findAllById(allMovieIds);
 
-        // Шаг 3: создать Map<ID, Movie> для быстрого доступа
+        // Создать Map<ID, Movie> для быстрого доступа
         Map<Long, MovieMongo> movieMap = movies.stream()
                 .collect(Collectors.toMap(MovieMongo::getId, Function.identity()));
 
-        // Шаг 4: разбираем фильмы по категориям
+        // Разбираем фильмы по категориям
         Map<String, List<MovieMongo>> categorizedMovies = new HashMap<>();
         user.getCategories().forEach((category, idStrings) -> {
             List<MovieMongo> categoryMovies = idStrings.stream()
                     .map(idStr -> {
                         try {
-                            return Long.valueOf(idStr); // преобразуем String в Long
+                            return Long.valueOf(idStr);
                         } catch (NumberFormatException e) {
-                            return null; // или логируй ошибку
+                            return null;
                         }
                     })
                     .filter(Objects::nonNull)
-                    .map(movieMap::get) // ищем по Long
+                    .map(movieMap::get)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 
             categorizedMovies.put(category, categoryMovies);
         });
 
-        // Шаг 5: собираем фильмы с оценками
+        // Собираем фильмы с оценками
         List<Map<String, Object>> scoredMovies = user.getScores().entrySet().stream()
                 .map(entry -> {
                     MovieMongo movie = movieMap.get(entry.getKey());
@@ -227,106 +221,18 @@ public class UserService {
             return ResponseEntity.status(500).body("Ошибка при обновлении реакции");
         }
 
-        // После обновления надо снова получить актуальные данные комментария
         CommentMongo updatedComment = mongoTemplate.findOne(query, CommentMongo.class);
 
         if (updatedComment == null) {
             return ResponseEntity.status(500).body("Ошибка при получении обновлённого комментария");
         }
 
-        // Формируем ответ
         Map<String, Object> response = new HashMap<>();
         response.put("count", updatedComment.getLikes().size() - updatedComment.getDislikes().size());
-//        response.put("dislikes", updatedComment.getDislikes().size());
         response.put("status", alreadyReacted ? "reaction_removed" : (isLike ? "liked" : "disliked"));
 
         return ResponseEntity.ok(response);
     }
-
-//    public ResponseEntity<Object> uploadPhoto(MultipartFile file) {
-//        UserDetails userDetails = getCurrentUser();
-//        AppUser user = userRepository.findByUsername(userDetails.getUsername());
-//
-//        if (user == null) {
-//            return ResponseEntity.status(404).body("Пользователь не найден");
-//        }
-//
-//        try {
-//            user.setPhoto(file.getBytes());
-//            userRepository.save(user);
-//
-//            return ResponseEntity.ok("Фото успешно загружено");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(500).body("Ошибка загрузки фото");
-//        }
-//    }
-
-
-//    public ResponseEntity<Object> addLikeForComment(String commentId) {
-//        UserDetails userDetails = getCurrentUser();
-//        UserMongo userMongo = userMongoRepository.findByUsername(userDetails.getUsername());
-//
-//        Query query = new Query(Criteria.where("_id").is(new ObjectId(commentId)));
-//
-//        CommentMongo commentData = mongoTemplate.findOne(query, CommentMongo.class);
-//        if (commentData != null) {
-//            if (commentData.getLikes().contains(userMongo.getId())) {
-//                Update update = new Update().pull("likes", userMongo.getId());
-//
-//                UpdateResult result = mongoTemplate.updateFirst(query, update, CommentMongo.class);
-//
-//                if (result.getMatchedCount() > 0) {
-//                    return ResponseEntity.ok().body("-");
-//                } else {
-//                    return ResponseEntity.status(401).body("Ошибка при изменении оценки");
-//                }
-//            }
-//            else {
-//                Update update = new Update().addToSet("likes", userMongo.getId());
-//
-//                UpdateResult result = mongoTemplate.updateFirst(query, update, CommentMongo.class);
-//
-//                if (result.getMatchedCount() == 0) {
-//                    return ResponseEntity.status(401).body("Ошибка при установке оценки");
-//                }
-//                return ResponseEntity.ok().body("+");
-//            }
-//        }
-//        return ResponseEntity.status(401).body("Ошибка при установке оценки");
-//    }
-//
-//    public ResponseEntity<Object> addDislikeForComment(String commentId) {
-//        UserDetails userDetails = getCurrentUser();
-//        UserMongo userMongo = userMongoRepository.findByUsername(userDetails.getUsername());
-//
-//        Query query = new Query(Criteria.where("_id").is(new ObjectId(commentId)));
-//
-//        CommentMongo commentData = mongoTemplate.findOne(query, CommentMongo.class);
-//        if (commentData != null) {
-//            if (commentData.getDislikes().contains(userMongo.getId())) {
-//                Update update = new Update().pull("dislikes", userMongo.getId());
-//
-//                UpdateResult result = mongoTemplate.updateFirst(query, update, CommentMongo.class);
-//
-//                if (result.getMatchedCount() > 0) {
-//                    return ResponseEntity.ok().body("+");
-//                } else {
-//                    return ResponseEntity.status(401).body("Ошибка при изменении оценки");
-//                }
-//            }
-//            else {
-//                Update update = new Update().addToSet("dislikes", userMongo.getId());
-//
-//                UpdateResult result = mongoTemplate.updateFirst(query, update, CommentMongo.class);
-//
-//                if (result.getMatchedCount() == 0) {
-//                    return ResponseEntity.status(401).body("Ошибка при установке оценки");
-//                }
-//                return ResponseEntity.ok().body("-");
-//            }
-//        }
-//        return ResponseEntity.status(401).body("Ошибка при установке оценки");
-//    }
 
     private double calculateNewRating(long id, int score) {
         MovieMongo movie = mongoTemplate.findOne(new Query(Criteria.where("_id").is(id)), MovieMongo.class);
@@ -372,16 +278,32 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    public ResponseEntity<Object> formingFavoriteUserGenres(String userId, List<String> favoriteGenres) {
+    public ResponseEntity<Object> formingFavoriteUserGenres(List<String> favoriteGenres) {
         UserDetails userDetails = getCurrentUser();
         UserMongo user = userMongoRepository.findByUsername(userDetails.getUsername());
         if (user != null) {
             user.setFavoriteGenres(favoriteGenres);
+            user.setHasChosenGenres(true);
+            user.setLastDismissedGenresAt(Instant.now());
             userMongoRepository.save(user);
             return ResponseEntity.ok().body("Success");
         }
         else {
             return ResponseEntity.status(401).body("Ошибка при формировании любимых жанров");
+        }
+    }
+
+    public ResponseEntity<MessageResponse> dismissGenresModal() {
+        try {
+            UserDetails userDetails = getCurrentUser();
+            UserMongo userMongo = userMongoRepository.findByUsername(userDetails.getUsername());
+            userMongo.setLastDismissedGenresAt(Instant.now());
+            userMongoRepository.save(userMongo);
+            return ResponseEntity.ok().body(new MessageResponse("Выбор любимых жанров перенесён"));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(404)
+                    .body(new MessageResponse("Произошла ошибка при скрытии жанров"));
         }
     }
 
