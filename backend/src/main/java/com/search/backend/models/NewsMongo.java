@@ -35,5 +35,5 @@ public class NewsMongo {
     private String url;
 
     @Field(write = Field.Write.ALWAYS)
-    private String publishedAt;
+    private Date publishedAt;
 }
