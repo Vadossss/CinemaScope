@@ -25,7 +25,7 @@ export default function App({ data }) {
   return (
     <Popover placement="right" open={openPopover} handler={setOpenPopover}>
       <PopoverHandler {...triggers}>
-        <Link className="focus:outline-none" href="#">
+        <Link className="focus:outline-none" href={`/persons/${data.id}`}>
           <span
             className="text-xs hover:text-orange-600 transition delay-100 ease-in-out"
           >
