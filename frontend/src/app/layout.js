@@ -53,7 +53,7 @@ export default function RootLayout({ children }) {
               <PlayerProvider player='/playerjs.js'>
                 <HeroUIProvider>
                   <ToastProvider />
-                    <div className="mt-4 flex flex-col items-center min-h-[calc(96vh-4rem)]">{children}</div>
+                    <div className="mt-6 flex flex-col items-center min-h-[calc(96vh-4rem)]">{children}</div>
                   <Footer />
                 </HeroUIProvider>
               </PlayerProvider>
