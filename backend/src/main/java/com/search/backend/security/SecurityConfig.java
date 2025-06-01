@@ -41,7 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/register", "/auth/login", "/auth/updateRefreshToken",
                                 "/auth/debugRoles", "/films/movie", "/films/getMovieById",
                                 "/comments/getCommentsForMovie", "films/popularNow", "/films/findByRegex",
-                                "/person/getPersons", "/person/findPersonByID").permitAll()
+                                "/person/getPersons", "/person/findPersonByID","news/save").permitAll()
                         .anyRequest().authenticated()
                 )
 
