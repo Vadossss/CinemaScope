@@ -35,10 +35,22 @@ export default function MovieHeader({filmData}) {
             <div className="flex flex-col">
                 <div>
                     <h1>
-                        <span
-                            className="text-4xl font-bold"
-                            style={{color: ratingColor}}
-                        >{(filmData.rating.kp).toFixed(1)}</span>
+                        {filmData.rating.kp > 0 ? (
+                            <span
+                                className="text-4xl font-bold"
+                                style={{color: ratingColor}}
+                            >{(filmData.rating.kp).toFixed(1)}
+                            </span>
+                        ) : (
+                            <div className="flex flex-col">
+                                <span
+                                    className="text-4xl font-bold"
+                                >-</span>
+                                {/*<span*/}
+                                {/*    className="text-xs line-clamp-3 leading-5"*/}
+                                {/*>Недостаточно оценок, рейтинг формируется</span>*/}
+                            </div>
+                        )}
                     </h1>
                 </div>
                 <div>
