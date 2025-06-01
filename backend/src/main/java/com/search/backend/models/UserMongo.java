@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +25,8 @@ public class UserMongo {
     private List<String> favoriteGenres = new ArrayList<>();
     private Map<String, List<String>> categories = new HashMap<>();
     private Map<Long, Score> scores = new HashMap<>();
+    private boolean hasChosenGenres = false;
+    private Instant lastDismissedGenresAt;
 
     @Getter
     @Setter
