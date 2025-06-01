@@ -1,22 +1,36 @@
 import { useState } from "react";
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@heroui/react";
 import { fetchNewCommentForFilm } from "@/app/utils/fetchNewScoreForFilm";
+import {useAuth} from "@/app/contexts/authContext";
+import {useRouter} from "next/navigation";
 
 export default function App({ movieId }) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [rating, setRating] = useState(0);
+    const { auth } = useAuth();
+    const router = useRouter();
 
     const handleRate = async () => {
         console.log(`Оценка фильма ${movieId}: ${rating} звезд`);
         const body = {id: movieId, score: rating};
         console.log(body);
         const res = await fetchNewCommentForFilm(body);
-        onOpenChange(false); // Закрыть модалку
+        onOpenChange(false);
     };
+
+    const handleButtonClick = () => {
+
+        if (auth === false) {
+            router.push("/auth");
+        }
+        else {
+            return onOpen();
+        }
+    }
 
     return (
         <div className="mt-2">
-            <Button onPress={onOpen} className="bg-gray-300 pr-3 pl-2" variant="bordered">
+            <Button onPress={() => handleButtonClick()} className="bg-gray-300 pr-3 pl-2" variant="bordered">
                 Оценить фильм
             </Button>
             <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
