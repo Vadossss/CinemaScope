@@ -4,11 +4,9 @@ import com.search.backend.models.*;
 import com.search.backend.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -55,7 +53,7 @@ public class UserController {
 //    @PreAuthorize("hasAnyAuthority('ROLE_CLIENT')")
     @PostMapping("/setFavoriteGenres")
     public ResponseEntity<Object> formingFavoriteUserGenres(@RequestBody FavoriteGenresRequest favoriteGenresRequest) {
-        return userService.formingFavoriteUserGenres(favoriteGenresRequest.getUserId(), favoriteGenresRequest.getFavoriteGenres());
+        return userService.formingFavoriteUserGenres(favoriteGenresRequest.getFavoriteGenres());
     }
 
     @GetMapping("/userPersonalCatalog")
@@ -90,8 +88,8 @@ public class UserController {
         return userService.recommendationForUser();
     }
 
-//    @PostMapping("/uploadPhoto")
-//    public ResponseEntity<Object> uploadPhoto(@RequestParam("file") MultipartFile file) {
-//        return userService.uploadPhoto(file);
-//    }
+    @PutMapping("/genresDismiss")
+    public ResponseEntity<MessageResponse> dismissGenresModal() {
+        return userService.dismissGenresModal();
+    }
 }
