@@ -23,7 +23,7 @@ export default function MoviePersonList({filmData, title, filterValue, descripti
                         ))}
                 </div>
                 <div className="mt-2">
-                    <Link href="">
+                    <Link href={!filmData.isSeries ? `/films/${filmData.id}/cast` : `/series/${filmData.id}/cast`}>
                         <span
                             className="text-xs font-thin text-orange-600">{filmData.persons.filter(p =>
                             p.profession === filterValue).length} {description}</span>
