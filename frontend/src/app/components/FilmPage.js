@@ -29,16 +29,6 @@ export default function App() {
 
     }, [])
 
-    useEffect(() => {
-
-        const script = document.createElement('script');
-        script.src = '//yohoho.cc/yo.js';
-        script.async = true;
-        document.getElementById('yohoho')?.appendChild(script);
-
-    }, []);
-
-
     if (isLoading) {
         return (
             <div>Загрузка</div>
