@@ -29,7 +29,7 @@ export default function App() {
 
     if (isLoading) {
         return (
-            <div className="w-[1600px] h-screen bg-white flex justify-center items-center">
+            <div className="w-[1600px] h-screen bg-white flex justify-center items-center rounded">
                 <Spinner color="default" />
             </div>
         )
