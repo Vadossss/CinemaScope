@@ -6,6 +6,7 @@ import GraficScore from "../../components/GraficScore";
 import PieGraficScore from "../../components/PieGraficScore";
 import {Tab, Tabs} from "@heroui/react";
 import GenresGraphScore from "../../components/GenresGraphScore";
+import GraphMovieByYear from "../../components/GraphMoviesByYear";
 
 
 const mockMovies = {
@@ -171,6 +172,11 @@ const App = () => {
                                 <div className="bg-blue-950 bg-opacity-60 rounded-xl p-6 shadow-lg">
                                     <h3 className="text-xl font-bold mb-4">Распределение по оценкам</h3>
                                     <GenresGraphScore data={userData.scoredMovies}/>
+                                </div>
+
+                                <div className="bg-blue-950 bg-opacity-60 rounded-xl p-6 shadow-lg">
+                                    <h3 className="text-xl font-bold mb-4">Добавленные фильмы по годам</h3>
+                                    <GraphMovieByYear data={userData.categorizedMovies}/>
                                 </div>
 
                                 <div className="bg-blue-950 bg-opacity-60 rounded-xl p-6 shadow-lg">
