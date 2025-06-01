@@ -9,14 +9,13 @@ export default function PersonsPage() {
   const [persons, setPersons] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
   const params = useParams();
   const personId = params.personId;
 
-
- 
-
   useEffect(() => {
     async function fetchData() {
+      setLoading(true);
       const [data, error] = await getPersons(page);
 
       if (error) {
@@ -29,100 +28,143 @@ export default function PersonsPage() {
         setPersons(data.content || []);
         setTotalPages(data.totalPages || 0);
       }
+      setLoading(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     fetchData();
   }, [page]);
 
-  
-
-  // Пагинация с максимум 10 кнопок (как раньше)
   const getPageNumbers = () => {
-    const maxButtons = 10;
-    let start = 0;
-    let end = totalPages;
+  const maxDisplayedPages = 5; // Сколько страниц отображать (без учёта многоточий)
+  const totalPagesArr = [];
 
-    if (totalPages > maxButtons) {
-      start = Math.max(page - Math.floor(maxButtons / 2), 0);
-      end = start + maxButtons;
-
-      if (end > totalPages) {
-        end = totalPages;
-        start = end - maxButtons;
-      }
+  if (totalPages <= maxDisplayedPages) {
+    // Если мало страниц, просто выводим все
+    for (let i = 0; i < totalPages; i++) {
+      totalPagesArr.push(i);
     }
+    return totalPagesArr;
+  }
 
-    const pages = [];
-    for (let i = start; i < end; i++) {
-      pages.push(i);
-    }
-    return pages;
-  };
-  const fixPhotoUrl = (url) => {
-  if (!url) return null;
-  return url.replace(/^https?:https?/, "https:");
+  // Всегда добавляем первую страницу
+  totalPagesArr.push(0);
+
+  // Вычисляем начальные и конечные номера страниц вокруг текущей
+  let start = Math.max(page - 1, 1);
+  let end = Math.min(page + 1, totalPages - 2);
+
+  // Добавляем многоточие между первой и средними
+  if (page > 2) {
+    totalPagesArr.push("...");
+  }
+
+  // Добавляем страницы вокруг текущей
+  for (let i = start; i <= end; i++) {
+    totalPagesArr.push(i);
+  }
+
+  // Добавляем многоточие между средними и последней
+  if (page < totalPages - 3) {
+    totalPagesArr.push("...");
+  }
+
+  // Всегда добавляем последнюю страницу
+  totalPagesArr.push(totalPages - 1);
+
+  return totalPagesArr;
 };
+  const fixPhotoUrl = (url) => {
+    if (!url) return "/base_poster.svg";
+    return url.replace("https:https://","https://");
+  };
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Персоны</h1>
+    <div className="p-4 md:p-8 bg-gray-50 min-h-screen w-[1600px]">
+      <h1 className="text-3xl font-bold text-black 600 mb-6 text-center">Персоны</h1>
 
-      {/* Сетка 15 колонок с карточками актёров */}
-      <div className="grid grid-cols-5 gap-6">
-        {persons.map((person) => (
-            <Link key={person.id} href={`/persons/${person.id}`} passHref>
-            <div
-              className="bg-white rounded-xl shadow p-4 flex flex-col items-center text-center cursor-pointer hover:shadow-lg transition"
+      {/* Лоадер */}
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : (
+        <>
+          {/* Сетка актёров */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+            {persons.map((person) => (
+              <Link key={person.id} href={`/persons/${person.id}`} passHref>
+                <div className="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer flex flex-col h-full">
+                  <img
+                    src={fixPhotoUrl(person.photo)}
+                    alt={person.name}
+                    className="w-full h-70 object-cover"
+                    onError={(e) => {
+                      e.target.src = "/base_poster.svg";
+                    }}
+                  />
+                  <div className="p-4 flex-grow">
+                    <h2 className="font-semibold text-lg truncate text-black 600">{person.name || person.enName}</h2>
+                    <p className="text-sm text-gray-600 mt-1">Возраст: {person.age || "—"}</p>
+                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                      {person.profession?.map((p) => p.value).join(", ") || "Профессии не указаны"}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Пагинация */}
+          <div className="mt-10 flex justify-center items-center space-x-2 flex-wrap">
+            <button
+              onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
+              disabled={page === 0}
+              className="p-2 bg-gray-200 hover:bg-gray-300 rounded-full disabled:opacity-50 transition"
+              aria-label="Предыдущая страница"
             >
               <img
-                src={(person.photo || "/base_poster.svg").replace("https:https://", "https://")}
-                alt={person.name}
-                className="w-24 h-24 object-cover rounded-md mb-3 border border-red-500"
+                src="/icon_next.svg"
+                alt="Назад"
+                className="w-5 h-5 transform rotate-180"
               />
-              <h2 className="font-semibold text-lg mb-1">
-                {person.name || person.enName}
-              </h2>
-              <p className="text-sm text-gray-600 mb-1">Возраст: {person.age || "—"}</p>
-              <p className="text-sm text-gray-500">
-                {person.profession?.map((p) => p.value).join(", ") || "Профессии не указаны"}
-              </p>
-            </div>
-          </Link>
-        ))}
-      </div>
+            </button>
 
-      {/* Пагинация */}
-      <div className="flex justify-center mt-8 space-x-2 items-center">
-        <button
-          onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
-          disabled={page === 0}
-          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
-        >
-          Назад
-        </button>
+            {getPageNumbers().map((pageNumber, index) =>
+              pageNumber === "..." ? (
+                <span key={`dot-${index}`} className="px-2 text-gray-500">
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={`page-${pageNumber}`}
+                  onClick={() => setPage(pageNumber)}
+                  className={`px-3 py-1.5 rounded-md transition-colors ${
+                    pageNumber === page
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                  }`}
+                >
+                  {pageNumber + 1}
+                </button>
+              )
+            )}
 
-        {getPageNumbers().map((pageNumber) => (
-          <button
-            key={pageNumber}
-            onClick={() => setPage(pageNumber)}
-            className={`px-3 py-2 rounded ${
-              pageNumber === page
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
-          >
-            {pageNumber + 1}
-          </button>
-        ))}
-
-        <button
-          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages - 1))}
-          disabled={page + 1 >= totalPages}
-          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
-        >
-          Вперёд
-        </button>
-      </div>
+            <button
+              onClick={() => setPage((prev) => Math.min(prev + 1, totalPages - 1))}
+              disabled={page >= totalPages - 1}
+              className="p-2 bg-gray-200 hover:bg-gray-300 rounded-full disabled:opacity-50 transition"
+              aria-label="Следующая страница"
+            >
+              <img
+                src="/icon_next.svg"
+                alt="Вперёд"
+                className="w-5 h-5"
+              />
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
