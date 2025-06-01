@@ -4,6 +4,8 @@ import { fetchGetUserProfileById } from "@/app/utils/fetchGetUserProfileById";
 import { useParams } from "next/navigation";
 import GraficScore from "../../components/GraficScore";
 import PieGraficScore from "../../components/PieGraficScore";
+import PieGraphGenresCount from "../../components/PieGraphGenresCount";
+import PieGraphCatalogsCount from "../../components/PieGraphCatalogsCount";
 import {Tab, Tabs} from "@heroui/react";
 import GenresGraphScore from "../../components/GenresGraphScore";
 import GraphMovieByYear from "../../components/GraphMoviesByYear";
@@ -159,6 +161,57 @@ const App = () => {
                         <Tab className="px-0" key="view" title="Обзор">
                             <section className="mb-12 mt-4 grid grid-cols-1 lg:grid-cols-2 gap-8">
 
+
+
+                                <div className="bg-blue-950 bg-opacity-60 rounded-xl p-6 shadow-lg">
+                                    <h3 className="text-xl font-bold mb-4">Количество фильмов по жанрам</h3>
+                                    <PieGraphGenresCount data={userData.categorizedMovies}/>
+                                </div>
+
+                                <div className="bg-blue-950 bg-opacity-60 rounded-xl p-6 shadow-lg">
+                                    <h3 className="text-xl font-bold mb-4">Количество фильмов в коллекциях</h3>
+                                    <PieGraphCatalogsCount data={userData.categorizedMovies}/>
+                                </div>
+
+
+
+                                <div className="bg-blue-950 bg-opacity-60 rounded-xl p-6 shadow-lg">
+                                    <h3 className="text-xl font-bold mb-4">Добавленные фильмы по годам</h3>
+                                    <GraphMovieByYear data={userData.categorizedMovies}/>
+                                </div>
+
+                                {/*<div className="bg-blue-950 bg-opacity-60 rounded-xl p-6 shadow-lg">*/}
+                                {/*    <h3 className="text-xl font-bold mb-4">Распределение по жанрам</h3>*/}
+                                {/*    <div className="grid grid-cols-2 gap-2 text-sm">*/}
+                                {/*        {Object.entries(genreStats).map(([genre, count]) => (*/}
+                                {/*            <div key={genre} className="flex justify-between items-center">*/}
+                                {/*                <span>{genre}</span>*/}
+                                {/*                <span className="font-semibold text-purple-400">{count}</span>*/}
+                                {/*            </div>*/}
+                                {/*        ))}*/}
+                                {/*    </div>*/}
+                                {/*</div>*/}
+
+                                {/*<div className="bg-gray-800 bg-opacity-60 rounded-xl p-6 shadow-lg">*/}
+                                {/*    <h3 className="text-xl font-bold mb-4">Оценки фильмов</h3>*/}
+                                {/*    <div className="flex gap-2 items-end h-24">*/}
+                                {/*        {Array.from({length: 10}, (_, i) => {*/}
+                                {/*            const score = i + 1;*/}
+                                {/*            const height = (scoreStats[score] || 0) * 10;*/}
+                                {/*            return (*/}
+                                {/*                <div key={score}*/}
+                                {/*                     className="w-6 bg-gradient-to-t from-purple-600 to-pink-500 rounded-t"*/}
+                                {/*                     style={{height: `${height}px`}}*/}
+                                {/*                     title={`Оценка ${score}: ${scoreStats[score] || 0}`}></div>*/}
+                                {/*            );*/}
+                                {/*        })}*/}
+                                {/*    </div>*/}
+                                {/*</div>*/}
+                            </section>
+                        </Tab>
+                        <Tab className="px-0" key="scores" title="Оценки">
+                            <section className="mb-12 mt-4 grid grid-cols-1 lg:grid-cols-2 gap-8">
+
                                 <div className="bg-blue-950 bg-opacity-60 rounded-xl p-6 shadow-lg">
                                     <h3 className="text-xl font-bold mb-4">Оценки пользователя</h3>
                                     <GraficScore data={userData.scoredMovies}/>
@@ -172,11 +225,6 @@ const App = () => {
                                 <div className="bg-blue-950 bg-opacity-60 rounded-xl p-6 shadow-lg">
                                     <h3 className="text-xl font-bold mb-4">Распределение по оценкам</h3>
                                     <GenresGraphScore data={userData.scoredMovies}/>
-                                </div>
-
-                                <div className="bg-blue-950 bg-opacity-60 rounded-xl p-6 shadow-lg">
-                                    <h3 className="text-xl font-bold mb-4">Добавленные фильмы по годам</h3>
-                                    <GraphMovieByYear data={userData.categorizedMovies}/>
                                 </div>
 
                                 <div className="bg-blue-950 bg-opacity-60 rounded-xl p-6 shadow-lg">
@@ -207,48 +255,6 @@ const App = () => {
                                     </div>
                                 </div>
                             </section>
-                        </Tab>
-                        <Tab className="px-0" key="scores" title="Оценки">
-                            <section className="mb-12 mt-4 grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-                                <div className="bg-blue-950 bg-opacity-60 rounded-xl p-6 shadow-lg">
-                                    <h3 className="text-xl font-bold mb-4">Оценки пользователя</h3>
-                                    <GraficScore data={userData.scoredMovies}/>
-                                </div>
-
-                                <div className="bg-blue-950 bg-opacity-60 rounded-xl p-6 shadow-lg">
-                                    <h3 className="text-xl font-bold mb-4">Распределение по оценкам</h3>
-                                    <PieGraficScore data={userData.scoredMovies}/>
-                                </div>
-
-                                <div className="bg-blue-950 bg-opacity-60 rounded-xl p-6 shadow-lg">
-                                    <h3 className="text-xl font-bold mb-4">Распределение по жанрам</h3>
-                                    <div className="grid grid-cols-2 gap-2 text-sm">
-                                        {Object.entries(genreStats).map(([genre, count]) => (
-                                            <div key={genre} className="flex justify-between items-center">
-                                                <span>{genre}</span>
-                                                <span className="font-semibold text-purple-400">{count}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="bg-gray-800 bg-opacity-60 rounded-xl p-6 shadow-lg">
-                                    <h3 className="text-xl font-bold mb-4">Оценки фильмов</h3>
-                                    <div className="flex gap-2 items-end h-24">
-                                        {Array.from({length: 10}, (_, i) => {
-                                            const score = i + 1;
-                                            const height = (scoreStats[score] || 0) * 10;
-                                            return (
-                                                <div key={score}
-                                                     className="w-6 bg-gradient-to-t from-purple-600 to-pink-500 rounded-t"
-                                                     style={{height: `${height}px`}}
-                                                     title={`Оценка ${score}: ${scoreStats[score] || 0}`}></div>
-                                            );
-                                        })}
-                                    </div>
-                                    </div>
-                                </section>
 
                         </Tab>
                         <Tab className="px-0" key="movies" title={
