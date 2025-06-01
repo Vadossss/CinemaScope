@@ -7,13 +7,15 @@ import {useAuth} from "@/app/contexts/authContext";
 import {Spinner} from "@heroui/react";
 import {fetchPopularMovie} from "@/app/utils/fetchPopularMovie";
 import {fetchWithAuth} from "@/app/utils/fetchWithAuth";
+import GenesModal from "./components/GenresModal";
 
 export default function Home() {
   const [isLoadingPopular, setLoadingPopular] = useState(true);
   const [isLoadingRecommendation, setLoadingRecommendation] = useState(true);
   const [moviePopularData, setMoviePopularData] = useState(null);
   const [movieRecommendationData, setMovieRecommendationData] = useState(null);
-  const { auth } = useAuth();
+  const { auth, hasChosenGenres, lastDismissed  } = useAuth();
+  const [showGenreModal, setShowGenreModal] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -29,6 +31,25 @@ export default function Home() {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+
+    if (hasChosenGenres === null) return;
+
+    if (lastDismissed !== null) {
+      const lastDismissedDate = new Date(lastDismissed);
+      const now = new Date();
+      const hoursSinceDismissed = (now.getTime() - lastDismissedDate.getTime()) / (1000 * 60 * 60);
+      console.log("Часы" + hoursSinceDismissed);
+      if (!hasChosenGenres && hoursSinceDismissed > 6) {
+        setShowGenreModal(true);
+
+      }
+    }
+    else {
+      setShowGenreModal(true);
+    }
+  }, [hasChosenGenres]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,6 +86,7 @@ export default function Home() {
 
   return (
     <div className="w-[1600px] bg-white flex flex-col items-center rounded gap-4 min-h-screen pt-8">
+      <GenesModal showGenreModal={showGenreModal} />
       <PopularMovieSwiper movieData={moviePopularData} />
       {auth && <RecommendationSwiper movieData={movieRecommendationData} />}
       {/*<RecommendationSwiper />*/}
