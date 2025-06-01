@@ -39,7 +39,6 @@ const CustomTooltip = ({ active, payload, label }) => {
     return null;
 };
 
-// Функция интерполяции
 function lerp(a, b, t) {
     return a + (b - a) * t;
 }
@@ -112,7 +111,7 @@ export default function App({ data }) {
     }));
 
     return (
-        <ResponsiveContainer width="100%" height={500}>
+        <ResponsiveContainer width="100%" height={400}>
             <BarChart
                 data={genreAverageScoresWithLabel}
                 layout="vertical"
@@ -142,7 +141,6 @@ export default function App({ data }) {
 
                 <Tooltip content={<CustomTooltip />} />
 
-                {/* Теперь используем предрассчитанный цвет из данных */}
                 <Bar
                     dataKey="averageScore"
                     // fill={`linear-gradient(90deg, #157acb,#ec1e1e)`}
