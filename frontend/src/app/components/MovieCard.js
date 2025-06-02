@@ -2,24 +2,43 @@
 
 import Link from "next/link";
 import { fetchAddWishlist } from "../utils/fetchAddWishlist";
+import {useAuth} from "@/app/contexts/authContext";
+import {useEffect, useState} from "react";
 
 export default function App({ data }) {
+    const { categories } = useAuth();
+    const [isAddToLists, setIsAddToLists] = useState(false);
+
+    // console.log(data.id);
+
+    useEffect(() => {
+        setIsAddToLists(Object.values(categories).some(list => {
+               return list.includes(String(data.id));
+            }
+        ));
+    }, [categories, data.id])
 
     const ratingColor = data.rating.kp > 7.1 ? "#3bb33b" : data.rating.kp > 4.1 ? "#777" : "#ff1414";
 
+    // console.log(isAddToLists);
+
     return (
         <div className="w-[150px] group/item">
-            <div
-                className={`group absolute z-10 top-[7px] right-4 pr-2 pl-2 text-sm rounded-sm invisible group-hover/item:visible`}>
-                <button
-                    className="bg-transparent hover:bg-[rgba(42,42,42,0.5)] transition-colors rounded"
-                    onClick={(e) => {
-                        fetchAddWishlist(data.id, "planned");
-                    }}
-                    title="Буду смотреть">
-                    <img className="-scale-100" src="icon_add.svg"></img>
-                </button>
-            </div>
+            {!isAddToLists && (
+                <div
+                    className={`group absolute z-10 top-[7px] right-4 pr-2 pl-2 text-sm
+                     rounded-sm invisible group-hover/item:visible`}>
+                    <button
+                        className="bg-transparent hover:bg-[rgba(42,42,42,0.5)] transition-colors rounded"
+                        onClick={(e) => {
+                            fetchAddWishlist(data.id, "planned");
+                            setIsAddToLists(true);
+                        }}
+                        title="Буду смотреть">
+                        <img className="-scale-100" src="icon_add.svg"></img>
+                    </button>
+                </div>
+            )}
 
             <Link href={data.isSeries ? `/series/${data.id}` : `/films/${data.id}`}>
                 <div className="relative">
