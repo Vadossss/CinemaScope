@@ -74,7 +74,7 @@ public class AuthService {
         }
         return ResponseEntity.ok(new CheckMeResponse(userMongo.getId(), user.getUsername(),
                 user.getAuthorities().iterator().next().getAuthority(), userMongo.getScores(),
-                userMongo.isHasChosenGenres(), userMongo.getLastDismissedGenresAt()));
+                userMongo.getCategories(), userMongo.isHasChosenGenres(), userMongo.getLastDismissedGenresAt()));
     }
 
     @Transactional
