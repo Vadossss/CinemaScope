@@ -37,9 +37,13 @@ export default function Home() {
       const now = new Date();
       const hoursSinceDismissed = (now.getTime() - lastDismissedDate.getTime()) / (1000 * 60 * 60);
       console.log("Часы" + hoursSinceDismissed);
+
+      if (hasChosenGenres) {
+        setShowGenreModal(false);
+      }
+
       if (!hasChosenGenres && hoursSinceDismissed > 6) {
         setShowGenreModal(true);
-
       }
     }
     else {
