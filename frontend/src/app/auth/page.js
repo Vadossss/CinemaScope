@@ -1,22 +1,12 @@
 "use client"
 
 import React from "react";
-import { Form, Input, Button, Checkbox } from "@heroui/react";
-import { Select, SelectItem } from "@heroui/react";
-
+import { Form, Input, Button } from "@heroui/react";
 import { Tabs, Tab, Link, Card, CardBody } from "@heroui/react";
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../contexts/authContext";
 import { fetchLogin } from "../utils/fetchLogin"
-
-export const animals = [
-    { key: "teenager", label: "12-16 лет" },
-    { key: "young", label: "17-21" },
-    { key: "adult", label: "22-40" },
-    { key: "elderly", label: "41-59" },
-    { key: "old", label: "60 и старше" },
-];
 
 export const EyeSlashFilledIcon = (props) => {
     return (
@@ -83,41 +73,20 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 export default function Auth() {
     const { auth, setAuth, refreshAuth } = useAuth();
     const [selected, setSelected] = React.useState("login");
-    const [action, setAction] = React.useState(null);
-    const [submitted, setSubmitted] = React.useState(null);
-    const [password, setPassword] = React.useState("");
-    const [gender, setGender] = useState("");
     const router = useRouter();
-    const [loginDisabled, setLoginDisabled] = useState(true)
     const [login, setLogin] = useState("");
     const [passwordLogin, setPasswordLogin] = useState("");
     const [errorsLogin, setErrors] = useState({ login: "", password: "" });
-    const [registerDisabled, setRegisterDisabled] = useState(true)
     const [loginRegister, setLoginRegister] = useState("");
     const [emailRegister, setEmailRegister] = useState("");
-    const [nameRegister, setNameRegister] = useState("");
-    const [lastNameRegister, setLastNameRegister] = useState("");
     const [passwordRegister, setPasswordRegister] = useState("");
-    const [passwordSecondRegister, setPasswordSecondRegister] = useState("");
-    const [ageRegister, setAgeRegister] = useState("");
-    const [touchedAge, setTouchedAge] = React.useState(false);
-    const [checkBoxRegister, setCheckBoxRegister] = useState(false);
-    const [isCaptcha, setCaptcha] = useState(false);
-    const [errorsRegister, setErrorsRegister] = useState({ login: "", password: "", passwordSecond: "", name: "", lastName: "", email: "", checkBox: "", age: "", sex: "", status: "" });
+    const [errorsRegister, setErrorsRegister] = useState({ login: "", password: "", email: "" });
     const searchParams = useSearchParams();
     const from = searchParams.get("from");
-
-
-    // const [registerMessage, setRegisterMessage] = useState("");
-
-    let source = "http://laba1.ru/api";
-    let source2 = "http://localhost:8085";
 
     const [isVisible, setIsVisible] = React.useState(false);
 
     const toggleVisibility = () => setIsVisible(!isVisible);
-
-    const errors = [];
 
     useEffect(() => {
         if (auth) {
@@ -126,58 +95,30 @@ export default function Auth() {
     }, [auth])
 
     useEffect(() => {
-        let loginError = login.length < 3 ? "Логин должен содержать минимум 6 символов" : "";
-        let passwordError = passwordLogin.length < 6 ? "Пароль должен содержать минимум 8 символов" : "";
+        let loginError = login.length < 4 ? "Логин должен содержать минимум 4 символов" : "";
+        let passwordError = passwordLogin.length < 6 ? "Пароль должен содержать минимум 6 символов" : "";
 
         setErrors({ login: loginError, password: passwordError });
         setRegisterMessage("");
     }, [login, passwordLogin]);
 
     useEffect(() => {
-        let loginError = loginRegister.length < 6 ? "Логин должен содержать минимум 6 символов" : "";
+        let loginError = loginRegister.length < 4 ? "Логин должен содержать минимум 4 символов" : "";
 
         let emailError = !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(emailRegister) ? "Неверный формат почты" : "";
 
-        let nameError = !/^[A-Za-zА-Яа-яЁё]{2,15}$/.test(nameRegister) ? "Имя должно содержать только буквы (2-15 символов)" : "";
-
-        let lastNameError = !/^[A-Za-zА-Яа-яёЁ]{2,15}(-[A-Za-zА-Яа-яёЁ]{2,15})?$/.test(lastNameRegister) ? "Фамилия должна быть 2-15 символов и может содержать один дефис" : "";
-
-
         let passwordError = "";
 
-        if (passwordRegister.length < 8) {
-            passwordError = "Пароль должен содержать минимум 8 символов";
+        if (passwordRegister.length < 6) {
+            passwordError = "Пароль должен содержать минимум 6 символов";
         } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(passwordRegister) && passwordRegister.length !== 0) {
             passwordError = "Пароль должен содержать хотя бы одну заглавную букву, строчную букву, цифру и специальный символ";
         }
 
-        let passwordSecondError = "";
-
-        if (passwordError === "") {
-            if (passwordRegister !== passwordSecondRegister) {
-                passwordSecondError = "Пароли не совпадают"
-            }
-        }
-
-        let ageError = ageRegister.length === 0 ? "Укажите ваш возраст" : "";
-
-        let checkBoxError = !checkBoxRegister ? "*Необходимо согласиться с правилами" : "";
-
-        setErrorsRegister({ login: loginError, password: passwordError, passwordSecond: passwordSecondError, name: nameError, lastName: lastNameError, email: emailError, checkBox: checkBoxError, age: ageError, sex: "" });
+        setErrorsRegister({ login: loginError, password: passwordError, email: emailError });
         setRegisterMessage("");
-    }, [loginRegister, passwordRegister, nameRegister, emailRegister, lastNameRegister, ageRegister, checkBoxRegister, passwordSecondRegister]);
+    }, [loginRegister, passwordRegister, emailRegister]);
 
-
-
-    if (password.length < 6) {
-        errors.push("Пароль должен быть больше 6 символов");
-    }
-    if ((password.match(/[A-ZА-Я]/g) || []).length < 1) {
-        errors.push("Пароль должен содержать хотя бы одну прописную букву");
-    }
-    if ((password.match(/[^a-zа-я0-9]/gi) || []).length < 1) {
-        errors.push("Пароль должен содержать хотя бы одну строчную букву");
-    }
 
     const [loginMessage, setLoginMessage] = useState('');
     const [registerMessage, setRegisterMessage] = useState('');
@@ -196,13 +137,15 @@ export default function Auth() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
-                // credentials: "include"
+                credentials: "include"
             });
             const result = await res.text();
             console.log('Server response:', result);
 
             if (res.ok) {
-                router.push("/dashboard");
+                await refreshAuth();
+                setAuth(true);
+                router.push("/");
                 return;
             }
 
@@ -225,7 +168,6 @@ export default function Auth() {
     }
 
     return (
-        // <div className="flex h-screen items-center justify-center">
         <div className="flex flex-col">
             <Card className="max-w-full w-[340px]">
                 <CardBody className="overflow-hidden">
@@ -291,7 +233,6 @@ export default function Auth() {
                             <Form
                                 className="w-full max-w-xs flex flex-col gap-4"
                                 validationBehavior="native"
-                                onReset={() => setAction("reset")}
                                 onSubmit={handleRegisterSubmit}
                             >
                                 <Input
@@ -376,8 +317,6 @@ export default function Auth() {
                 </CardBody>
             </Card>
         </div>
-
-        // </div>
     );
 }
 
