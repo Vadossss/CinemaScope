@@ -128,6 +128,63 @@ public class UserService {
         if (userMongo == null) return ResponseEntity.status(404).body(new MessageResponse("Пользователь не существует"));
         return ResponseEntity.ok().body(userMongo.getScores());
     }
+    
+    public ResponseEntity<Object> deleteMovieFromTheList(DeleteMovieFromTheListRequest deleteMovieFromTheListRequest) {
+        UserDetails currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return ResponseEntity.status(401).body(new MessageResponse("Ошибка пользователя"));
+        }
+        UserMongo userMongo = userMongoRepository.findByUsername(currentUser.getUsername());
+        if (userMongo == null) return ResponseEntity.status(404).body(new MessageResponse("Пользователь не существует"));
+
+        Map<String, List<String>> categories = userMongo.getCategories();
+
+        List<String> fromList = categories.getOrDefault(deleteMovieFromTheListRequest.getFromCategory(), new ArrayList<>());
+        if (!fromList.contains(deleteMovieFromTheListRequest.getMovieId())) {
+            return ResponseEntity.status(400).body("Элемент не найден в списке");
+        }
+
+        fromList.remove(deleteMovieFromTheListRequest.getMovieId());
+        categories.put(deleteMovieFromTheListRequest.getFromCategory(), fromList);
+
+        userMongo.setCategories(categories);
+        userMongoRepository.save(userMongo);
+
+        return ResponseEntity.ok(new MessageResponse("Элемент успешно удалён из списка"));
+    }
+
+    public ResponseEntity<Object> changeListMovie(ChangeListMovieRequest changeListMovieRequest) {
+        UserDetails currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return ResponseEntity.status(401).body(new MessageResponse("Ошибка пользователя"));
+        }
+        UserMongo userMongo = userMongoRepository.findByUsername(currentUser.getUsername());
+        if (userMongo == null) return ResponseEntity.status(40).body(new MessageResponse("Пользователь не существует"));
+
+        Map<String, List<String>> categories = userMongo.getCategories();
+
+        // Проверяем наличие исходного списка
+        List<String> fromList = categories.getOrDefault(changeListMovieRequest.getFromCategory(), new ArrayList<>());
+        if (!fromList.contains(changeListMovieRequest.getMovieId())) {
+            return ResponseEntity.status(400).body("Элемент не найден в списке");
+        }
+
+        // Удаляем из исходной категории
+        fromList.remove(changeListMovieRequest.getMovieId());
+        categories.put(changeListMovieRequest.getFromCategory(), fromList);
+
+        // Добавляем в целевую категорию
+        List<String> toList = categories.getOrDefault(changeListMovieRequest.getToCategory(), new ArrayList<>());
+        if (!toList.contains(changeListMovieRequest.getMovieId())) {
+            toList.add(changeListMovieRequest.getMovieId());
+        }
+        categories.put(changeListMovieRequest.getToCategory(), toList);
+
+        userMongo.setCategories(categories);
+        userMongoRepository.save(userMongo);
+
+        return ResponseEntity.ok(new MessageResponse("Элемент успешно перенесён в другой список"));
+    }
 
     public List<MovieMongo> recommendationForUser() {
         UserDetails currentUser = getCurrentUser();
