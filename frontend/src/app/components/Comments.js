@@ -11,10 +11,10 @@ export default function App({ id }) {
     const fetchData = useCallback(async () => {
         try {
             const data = await fetchComments(id);
-            setComments(data ?? []); // если null, сразу пустой массив
+            setComments(data ?? []);
         } catch (error) {
             console.log(error);
-            setComments([]); // в случае ошибки — тоже пустой массив
+            setComments([]);
         }
     }, [id]);
 
