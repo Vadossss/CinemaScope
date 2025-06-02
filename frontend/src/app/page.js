@@ -18,10 +18,6 @@ export default function Home() {
   const [showGenreModal, setShowGenreModal] = useState(false);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
     const fetchData = async () => {
       const [result, isLoading] = await fetchPopularMovie();
       console.log(result);
@@ -89,7 +85,6 @@ export default function Home() {
       <GenesModal showGenreModal={showGenreModal} />
       <PopularMovieSwiper movieData={moviePopularData} />
       {auth && <RecommendationSwiper movieData={movieRecommendationData} />}
-      {/*<RecommendationSwiper />*/}
     </div>
   );
 }
