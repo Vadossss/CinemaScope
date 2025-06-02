@@ -92,4 +92,9 @@ public class UserController {
     public ResponseEntity<MessageResponse> dismissGenresModal() {
         return userService.dismissGenresModal();
     }
+
+    @GetMapping("/getUserScores")
+    public ResponseEntity<Object> getUserScores(@RequestParam String userId) {
+        return userService.getUserScore(userId);
+    }
 }
