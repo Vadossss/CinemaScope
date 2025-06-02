@@ -12,8 +12,8 @@ export async function fetchGetUserProfileById(id) {
             return [await res.json(), false];
         }
         else if (res.status === 404) {
-            console.log("Ошибка");
-            return [await res.text(), false]
+            // console.log("Ошибка");
+            return [null, false]
         }
     } catch (error) {
         console.log("Error");
