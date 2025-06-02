@@ -78,14 +78,14 @@ export default function Home() {
 
   if (isLoadingPopular || isLoadingRecommendation) {
     return (
-        <div className="w-[1600px] h-screen bg-white flex justify-center rounded items-center">
+        <div className="w-[1600px] h-screen bg-white flex justify-center rounded-xl items-center">
           <Spinner color="warning" />
         </div>
     )
   }
 
   return (
-    <div className="w-[1600px] bg-white flex flex-col items-center rounded gap-4 min-h-screen pt-8">
+    <div className="w-[1600px] bg-white flex flex-col items-center rounded-xl gap-4 min-h-screen pt-8">
       <GenesModal showGenreModal={showGenreModal} />
       <PopularMovieSwiper movieData={moviePopularData} />
       {auth && <RecommendationSwiper movieData={movieRecommendationData} />}

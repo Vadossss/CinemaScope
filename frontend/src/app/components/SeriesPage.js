@@ -6,6 +6,7 @@ import { useParams } from "next/navigation"
 import Comments from "@/app/components/Comments";
 import MovieHeader from "@/app/components/MovieHeader";
 import MovieBody from "@/app/components/MovieBody";
+import {Spinner} from "@heroui/react";
 
 export default function App() {
     const [filmData, setFilmData] = useState(null);
@@ -31,13 +32,15 @@ export default function App() {
 
     if (isLoading) {
         return (
-            <div>Загрузка</div>
+            <div className="w-[1600px] h-screen bg-white flex justify-center rounded-xl items-center">
+                <Spinner color="warning" />
+            </div>
         )
     }
     console.log(filmData)
 
     return (
-        <div className="w-[1504px] flex bg-white pt-5 pb-5 rounded justify-center">
+        <div className="w-[1504px] flex bg-white pt-5 pb-5 rounded-xl justify-center">
             <main>
                 <div className="flex flex-col w-[1280px]">
                     <div className="flex mr-16 ml-16 gap-10">
@@ -55,16 +58,6 @@ export default function App() {
                                             title="YouTube video player" frameBorder="0"
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; web-share"
                                             referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
-                                        {/*<div className="plyr__video-embed" id="player">*/}
-                                        {/*    <iframe*/}
-                                        {/*        className="rounded"*/}
-                                        {/*        src={`${filmData.trailer}?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;controls=0;showinfo=1&amp;rel=0&amp;enablejsapi=1`}*/}
-                                        {/*        // allowFullScreen*/}
-                                        {/*        // allowTransparency*/}
-                                        {/*        allow="autoplay"*/}
-                                        {/*    ></iframe>*/}
-                                        {/*</div>*/}
-
                                     </div>
                                 )}
                             </div>

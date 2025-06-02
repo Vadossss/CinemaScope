@@ -6,6 +6,7 @@ import { useParams } from "next/navigation"
 import Comments from "@/app/components/Comments";
 import MovieHeader from "@/app/components/MovieHeader";
 import MovieBody from "@/app/components/MovieBody";
+import {Spinner} from "@heroui/react";
 
 export default function App() {
     const [filmData, setFilmData] = useState(null);
@@ -31,7 +32,9 @@ export default function App() {
 
     if (isLoading) {
         return (
-            <div>Загрузка</div>
+            <div className="w-[1600px] h-screen bg-white flex justify-center rounded-xl items-center">
+                <Spinner color="warning" />
+            </div>
         )
     }
     console.log(filmData)

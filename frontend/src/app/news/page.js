@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { NewsCard } from "../components/NewsCard";
 import { getNews } from "../utils/fetchGetAllNews";
+import {Spinner} from "@heroui/react";
 
 export default function NewsPage() {
   const [news, setNews] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [isLoading, setLoading] = useState(true);
 
-  // Получаем данные
   useEffect(() => {
     async function fetchData() {
       const [data, error] = await getNews(page);
@@ -20,6 +21,7 @@ export default function NewsPage() {
       }
       setNews(data.content || []);
       setTotalPages(data.totalPages || 0);
+      setLoading(false);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
@@ -54,23 +56,29 @@ export default function NewsPage() {
     return pages;
   };
 
+  if (isLoading) {
+    return (
+        <div className="w-[1600px] h-screen bg-white flex justify-center rounded-xl items-center">
+          <Spinner color="warning" />
+        </div>
+    )
+  }
+
   return (
-    <div className="bg-gray-100 px-4 py-8 md:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="bg-gray-100 py-8 px-8 rounded-xl w-[1600px]">
+      <div className="mx-auto">
         <h1 className="text-3xl font-extrabold text-center text-gray-900 mb-10">
           Медиа
         </h1>
 
-        {/* Сетка новостей */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
           {news.map((item, index) => (
             <NewsCard key={item.id || index} item={item} index={index} />
           ))}
         </div>
 
-        {/* Пагинация */}
         <div className="mt-12 flex justify-center items-center space-x-1">
-          {/* Кнопка "Назад" */}
+
           <button
             onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
             disabled={page === 0}
@@ -111,7 +119,6 @@ export default function NewsPage() {
             )
           )}
 
-          {/* Кнопка "Вперёд" */}
           <button
             onClick={() => setPage((prev) => Math.min(prev + 1, totalPages - 1))}
             disabled={page >= totalPages - 1}

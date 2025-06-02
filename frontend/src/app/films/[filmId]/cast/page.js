@@ -27,16 +27,6 @@ export default function App() {
         fetchData();
     }, [])
 
-    if (isLoading) {
-        return (
-            <div className="w-[1600px] h-screen bg-white flex justify-center items-center rounded">
-                <Spinner color="default" />
-            </div>
-        )
-    }
-
-
-
     const groupedCast = data.reduce((acc, person) => {
         const profession = person.profession || 'Неизвестно';
         if (!acc[profession]) acc[profession] = [];
@@ -46,7 +36,6 @@ export default function App() {
 
     const professions = ['Все', ...Object.keys(groupedCast)];
 
-    // Фильтрация по поисковому запросу и активной вкладке
     const filteredCast = activeTab === 'Все'
         ? data.filter(person =>
             (person.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -57,9 +46,17 @@ export default function App() {
             person.enName?.toLowerCase().includes(searchTerm.toLowerCase()))
     ) || [];
 
+    if (isLoading) {
+        return (
+            <div className="w-[1600px] h-screen bg-white flex justify-center rounded-xl items-center">
+                <Spinner color="warning" />
+            </div>
+        )
+    }
+
     return (
-        <div className="lg:w-[1504px] min-h-screen bg-gray-50 rounded">
-            {/* Search and Filter */}
+        <div className="lg:w-[1504px] min-h-screen bg-gray-50 rounded-xl">
+
             <div className="container mx-auto px-8 mt-8 relative z-10">
                 <div className="bg-white rounded-xl shadow-lg p-6 backdrop-blur-sm bg-opacity-90 border border-gray-200">
                     <div className="mb-6">
@@ -88,7 +85,6 @@ export default function App() {
                         </div>
                     </div>
 
-                    {/* Tabs */}
                     <div className="flex flex-wrap gap-2">
                         {professions.map((profession) => (
                             <button
@@ -107,7 +103,6 @@ export default function App() {
                 </div>
             </div>
 
-            {/* Main Content */}
             <main className="container mx-auto px-8 py-12">
                 {filteredCast.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
@@ -140,7 +135,6 @@ export default function App() {
     );
 }
 
-// Component for each person card
 function PersonCard({ person }) {
     return (
         <div className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-100">
