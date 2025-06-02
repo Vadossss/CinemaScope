@@ -10,9 +10,10 @@ import {
     User,
     Spinner
 } from "@heroui/react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/authContext";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 
 const items = [
     {
@@ -39,6 +40,7 @@ let source = "http://localhost:8085";
 export default function App() {
     const { auth, username, userId, setAuth } = useAuth();
     const [isLoading, setLoading] = useState(true);
+    const router  = useRouter();
 
     useEffect(() => {
         if (auth !== null) {
@@ -47,10 +49,14 @@ export default function App() {
     }, [auth]);
 
     const handleLogout = async () => {
-        await fetch('http://localhost:8085/auth/logout', { method: 'POST', credentials: "include" });
+        router.push("/")
         setAuth(false);
-        // После выхода обновляем интерфейс, например, перенаправляем на страницу логина
-        // window.location.href = '/login';
+        await fetch('http://localhost:8085/auth/logout', { method: 'POST', credentials: "include" });
+        // return (
+        //     <div className="w-[1600px] h-screen bg-white flex justify-center rounded-xl items-center">
+        //         <Spinner color="warning" />
+        //     </div>
+        // )
     };
 
     if (isLoading) {
