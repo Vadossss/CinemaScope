@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
     const [userId, setUserId] = useState(null);
     const [hasChosenGenres, setHasChosenGenres] = useState(null);
     const [lastDismissed, setLastDismissed] = useState(null);
+    const [scores, setScores] = useState([]);
 
     const resetAuthState = () => {
         setAuth(false);
@@ -18,6 +19,7 @@ export const AuthProvider = ({ children }) => {
         setUserId(null);
         setHasChosenGenres(null);
         setLastDismissed(null);
+        setScores(null);
     };
 
     const refreshAuth = async () => {
@@ -34,6 +36,7 @@ export const AuthProvider = ({ children }) => {
                 setUserId(data.id);
                 setHasChosenGenres(data.hasChosenGenres);
                 setLastDismissed(data.lastDismissedGenresAt);
+                setScores(data.scores);
                 setAuth(true);
             } else {
                 console.log("Пользователь не авторизован или обновление токена не удалось");
@@ -50,7 +53,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ auth, setAuth, username, hasChosenGenres, lastDismissed, role, userId, resetAuthState, refreshAuth }}>
+        <AuthContext.Provider value={{ auth, setAuth, username, hasChosenGenres, lastDismissed, scores, role, userId, resetAuthState, refreshAuth }}>
             {children}
         </AuthContext.Provider>
     );
