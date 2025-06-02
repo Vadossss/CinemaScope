@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
     const [hasChosenGenres, setHasChosenGenres] = useState(null);
     const [lastDismissed, setLastDismissed] = useState(null);
     const [scores, setScores] = useState([]);
+    const [categories, setCategories] = useState([]);
 
     const resetAuthState = () => {
         setAuth(false);
@@ -20,6 +21,7 @@ export const AuthProvider = ({ children }) => {
         setHasChosenGenres(null);
         setLastDismissed(null);
         setScores(null);
+        setCategories(null);
     };
 
     const refreshAuth = async () => {
@@ -36,6 +38,7 @@ export const AuthProvider = ({ children }) => {
                 setUserId(data.id);
                 setHasChosenGenres(data.hasChosenGenres);
                 setLastDismissed(data.lastDismissedGenresAt);
+                setCategories(data.categories);
                 setScores(data.scores);
                 setAuth(true);
             } else {
@@ -53,7 +56,8 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ auth, setAuth, username, hasChosenGenres, lastDismissed, scores, role, userId, resetAuthState, refreshAuth }}>
+        <AuthContext.Provider value={{ auth, setAuth, username, categories, hasChosenGenres, lastDismissed,
+            scores, role, userId, resetAuthState, refreshAuth }}>
             {children}
         </AuthContext.Provider>
     );
