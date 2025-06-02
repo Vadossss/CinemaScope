@@ -1,12 +1,12 @@
 "use client"
 import React, { useState, useEffect } from "react";
 import { fetchGetUserProfileById } from "@/app/utils/fetchGetUserProfileById";
-import { useParams } from "next/navigation";
+import {useParams, useRouter} from "next/navigation";
 import GraficScore from "../../components/GraficScore";
 import PieGraficScore from "../../components/PieGraficScore";
 import PieGraphGenresCount from "../../components/PieGraphGenresCount";
 import PieGraphCatalogsCount from "../../components/PieGraphCatalogsCount";
-import {Tab, Tabs} from "@heroui/react";
+import {Spinner, Tab, Tabs} from "@heroui/react";
 import GenresGraphScore from "../../components/GenresGraphScore";
 import GraphMovieByYear from "../../components/GraphMoviesByYear";
 import MovieListForUser from "../../components/MovieListForUser";
@@ -17,6 +17,7 @@ const App = () => {
     const [isUpdate, setUpdate] = useState(false);
     const params = useParams();
     const userId = params.userId;
+    const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -28,9 +29,17 @@ const App = () => {
         fetchData();
     }, [isUpdate]);
 
-    if (isLoading) {
+    useEffect(() => {
+        if (!isLoading && userData === null) {
+            router.push("/error");
+        }
+    }, [userData, isLoading, router]);
+
+    if (isLoading || userData === null) {
         return (
-            <div>Загрузка</div>
+            <div className="w-[1600px] h-screen bg-white flex justify-center rounded-xl items-center">
+                <Spinner color="warning" />
+            </div>
         )
     }
 
