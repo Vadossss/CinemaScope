@@ -73,7 +73,8 @@ public class AuthService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.ok(new CheckMeResponse(userMongo.getId(), user.getUsername(),
-                user.getAuthorities().iterator().next().getAuthority(), userMongo.isHasChosenGenres(), userMongo.getLastDismissedGenresAt()));
+                user.getAuthorities().iterator().next().getAuthority(), userMongo.getScores(),
+                userMongo.isHasChosenGenres(), userMongo.getLastDismissedGenresAt()));
     }
 
     @Transactional
