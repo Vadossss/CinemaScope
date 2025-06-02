@@ -5,6 +5,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface UserRepository extends JpaRepository<AppUser, Integer> {
 
@@ -16,5 +18,7 @@ public interface UserRepository extends JpaRepository<AppUser, Integer> {
 
     @Transactional
     void deleteByUsername(String username);
+
+    List<AppUser> findByUsernameRegexIgnoreCase(String regex);
 }
 
