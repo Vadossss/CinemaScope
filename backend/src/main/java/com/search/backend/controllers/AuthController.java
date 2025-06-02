@@ -66,11 +66,7 @@ public class AuthController {
         return authService.updateRefreshToken(request);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @PostMapping("/setRole")
-    public ResponseEntity<Object> setUserRole(@RequestBody SetRoleRequest setRoleRequest) {
-        return authService.setUserRole(setRoleRequest.getUserId(), setRoleRequest.getRole());
-    }
+
 
     @GetMapping("/debugRoles")
     public ResponseEntity<?> debugRoles(Authentication authentication) {
