@@ -10,6 +10,7 @@ import {Spinner, Tab, Tabs} from "@heroui/react";
 import GenresGraphScore from "../../components/GenresGraphScore";
 import GraphMovieByYear from "../../components/GraphMoviesByYear";
 import MovieListForUser from "../../components/MovieListForUser";
+import {CategoriesContextProvider} from "@/app/contexts/categoriesMoviesContext";
 
 const App = () => {
     const [userData, setUserData] = useState(null);
@@ -66,7 +67,7 @@ const App = () => {
                 {/*<div className="flex flex-wrap gap-4 mb-5">*/}
                 <Tabs
                     classNames={{
-                        tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider",
+                        tabList: "gap-10 w-full relative rounded-none p-0 border-b border-divider",
                         cursor: "w-full bg-orange-500",
                         tab: "max-w-fit px-0 h-12",
                         tabContent: "group-data-[selected=true]:text-orange-500 group-data-[selected=true]:font-bold",
@@ -118,9 +119,11 @@ const App = () => {
                             <span>Фильмы</span>
                         </div>
                     }>
-                        <section className="mb-1">
-                            <MovieListForUser setUpdate={setUpdate} dataMovie={userData.categorizedMovies}/>
-                        </section>
+                        <CategoriesContextProvider>
+                            <section className="mb-1">
+                                <MovieListForUser setUpdate={setUpdate} dataMovie={userData.categorizedMovies}/>
+                            </section>
+                        </CategoriesContextProvider>
                     </Tab>
                 </Tabs>
             </main>
