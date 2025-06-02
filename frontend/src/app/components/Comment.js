@@ -39,24 +39,35 @@ export default function App({ data }) {
     const router = useRouter();
     console.log(data);
     console.log(userId);
-    useEffect(() => {
-        setGradeColor(grade > 0 ? "#3bb33b" : grade < 0 ? "#ff1414" : "#777");
-    }, [grade]);
+
 
     useEffect(() => {
-        if (data.likes.includes(userId)) {
-            setColorLikeArrow("#3cce7b");
-        }
-        else {
-            setColorLikeArrow("#1f1f1f");
-        }
-        if (data.dislikes.includes(userId)) {
-            setColorDislikeArrow("#ff1414");
-        }
-        else {
-            setColorDislikeArrow("#1f1f1f");
-        }
-    }, []);
+        setGrade(data.likes.length - data.dislikes.length);
+        setColorLikeArrow(data.likes.includes(userId) ? "#3cce7b" : "#1f1f1f");
+        setColorDislikeArrow(data.dislikes.includes(userId) ? "#ff1414" : "#1f1f1f");
+    }, [data, userId]);
+
+    useEffect(() => {
+        if (grade > 0) setGradeColor("#3cce7b");
+        else if (grade < 0) setGradeColor("#ff0000");
+        else setGradeColor("#000000");
+    }, [grade]);
+
+    // useEffect(() => {
+    //     if (data.likes.includes(userId)) {
+    //         setColorLikeArrow("#3cce7b");
+    //     } else {
+    //         setColorLikeArrow("#1f1f1f");
+    //     }
+    //
+    //     if (data.dislikes.includes(userId)) {
+    //         setColorDislikeArrow("#ff1414");
+    //     } else {
+    //         setColorDislikeArrow("#1f1f1f");
+    //     }
+    //
+    //     setGrade(data.likes.length - data.dislikes.length);
+    // }, [data, userId]);
 
     // useEffect(() => {
     //     if (isLiked) {
