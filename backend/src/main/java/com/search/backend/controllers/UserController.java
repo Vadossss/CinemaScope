@@ -97,4 +97,14 @@ public class UserController {
     public ResponseEntity<Object> getUserScores(@RequestParam String userId) {
         return userService.getUserScore(userId);
     }
+
+    @PostMapping("/changeListMovie")
+    public ResponseEntity<Object> changeListMovie(@RequestBody ChangeListMovieRequest changeListMovieRequest) {
+        return userService.changeListMovie(changeListMovieRequest);
+    }
+
+    @PostMapping("/deleteMovieFromTheList")
+    public ResponseEntity<Object> deleteMovieFromTheList(@RequestBody DeleteMovieFromTheListRequest deleteMovieFromTheListRequest) {
+        return userService.deleteMovieFromTheList(deleteMovieFromTheListRequest);
+    }
 }
