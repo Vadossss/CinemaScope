@@ -34,9 +34,6 @@ const items = [
     },
 ];
 
-
-let source = "http://localhost:8085";
-
 export default function App() {
     const { auth, username, userId, setAuth } = useAuth();
     const [isLoading, setLoading] = useState(true);
@@ -115,14 +112,3 @@ export default function App() {
         </>
     );
 }
-
-// <DropdownItem
-//     key={item.key}
-//     className={item.key === "logout" ? "text-danger" : ""}
-//     color={item.key === "logout" ? "danger" : "default"}
-//     onPress={() => item.key === "logout" && handleLogout()}
-// >
-//     <Link href={item.key === 'profile' ? `/user/${userId}` : '#'}>
-//         {item.label}
-//     </Link>
-// </DropdownItem>
