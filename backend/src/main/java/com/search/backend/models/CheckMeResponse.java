@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -13,6 +14,7 @@ public class CheckMeResponse {
     private String id;
     private String username;
     private String role;
+    private Map<Long, UserMongo.Score> scores;
     private boolean hasChosenGenres;
     private Instant lastDismissedGenresAt;
 }
