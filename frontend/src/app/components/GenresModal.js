@@ -13,6 +13,7 @@ import {useEffect, useState} from "react";
 import GenreModalButton from "./GenresModalButton";
 import { fetchGenresModal } from "../utils/fetchGenresModal";
 import { fetchDismissGenresModal } from "../utils/fetchDismissGenresModal";
+import {useAuth} from "@/app/contexts/authContext";
 
 const genres = [
     { name: "аниме", slug: "anime" },
@@ -52,7 +53,7 @@ const genres = [
 export default function App({showGenreModal}) {
     const [isOpen, setIsOpen] = useState(false);
     const [genresArray, setGenresArray] = useState([]);
-
+    const { setHasChosenGenres, setLastDismissed } = useAuth();
 
     const modalButtonHandler = (genre) => {
         if (genresArray.includes(genre)) {
@@ -104,6 +105,7 @@ export default function App({showGenreModal}) {
                                     variant="light"
                                     onPress={async () => {
                                         await fetchDismissGenresModal();
+                                        setLastDismissed(new Date());
                                         onClose();
                                 }}>
                                     Потом
@@ -112,6 +114,8 @@ export default function App({showGenreModal}) {
                                     color="primary"
                                     onPress={async () => {
                                         await fetchGenresModal(genresArray);
+                                        setHasChosenGenres(true);
+                                        setLastDismissed(new Date());
                                         onClose();
                                     }}>
                                     Сохранить
