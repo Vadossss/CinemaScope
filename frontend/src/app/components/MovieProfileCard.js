@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { fetchAddWishlist } from "../utils/fetchAddWishlist";
 import ProfileCardMovieModal from "./ProfileCardMovieModal";
-import {useDisclosure} from "@heroui/react";
+import {Spinner, useDisclosure} from "@heroui/react";
 import {useAuth} from "@/app/contexts/authContext";
 import {useEffect, useState} from "react";
 import {useParams} from "next/navigation";
 import {fetchGetUserScores} from "@/app/utils/fetchGetUserScores";
 
-export default function App({ setUpdate, data }) {
+export default function App({ setUpdate, data, dataCategory }) {
     const params = useParams();
     const paramUserId = params.userId;
     const [scores, setScores] = useState(null);
@@ -17,6 +17,9 @@ export default function App({ setUpdate, data }) {
     const [isLoading, setIsLoading] = useState(true);
     const { userId } = useAuth();
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    const [categoryName, setCategoryName] = useState("");
+
+    console.log(dataCategory);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -32,12 +35,29 @@ export default function App({ setUpdate, data }) {
         setUpdate(true);
     }, [score])
 
+    useEffect(() => {
+        for (const [key, array] of Object.entries(dataCategory)) {
+            if (array.some(item => item.id === data.id)) {
+                setCategoryName(key);
+                break;
+            }
+        }
+    }, []);
+
     if (isLoading) {
         return (
-            <div></div>
+            <div className="w-[149px] h-[225px] flex justify-center rounded bg-gray-100">
+                <Spinner color="warning" />
+            </div>
         )
     }
 
+    console.log(dataCategory)
+
+
+
+
+    console.log(categoryName);
 
     // const ratingColor = data.rating.kp > 7.1 ? "#3bb33b" : data.rating.kp > 4.1 ? "#777" : "#ff1414";
 
@@ -51,7 +71,16 @@ export default function App({ setUpdate, data }) {
 
             {userId === paramUserId && (
                 <>
-                    <ProfileCardMovieModal isOpen={isOpen} setScore={setScore} onopen={onOpen} onOpenChange={onOpenChange} score={score} bgColor={bgColor} movieId={data.id} />
+                    <ProfileCardMovieModal isOpen={isOpen}
+                                           setScore={setScore}
+                                           onopen={onOpen}
+                                           onOpenChange={onOpenChange}
+                                           score={score}
+                                           bgColor={bgColor}
+                                           movieId={data.id}
+                                           categoryName={categoryName}
+                                           setCategoryName={setCategoryName}
+                    />
 
                     <div className={`group absolute z-10 top-[7px] right-0 pr-2 pl-2 text-sm rounded-sm invisible group-hover/item:visible`}>
                         <button
