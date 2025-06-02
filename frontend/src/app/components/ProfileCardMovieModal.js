@@ -1,5 +1,3 @@
-"use client"
-
 import {
     Modal,
     ModalContent,
@@ -7,10 +5,12 @@ import {
     ModalBody,
     ModalFooter,
     Button,
-    useDisclosure,
 } from "@heroui/react";
-import {useEffect} from "react";
 import RateMovieButtonForProfile from "./RateMovieButtonForProfile";
+import DropdownProfileMovieCard from "./DropdownProfileMovieCard";
+import {useCategories} from "@/app/contexts/categoriesMoviesContext";
+import {fetchChangeListMovie} from "@/app/utils/fetchChangeListMovie";
+import { fetchDeleteMovieFromTheList } from "@/app/utils/fetchDeleteMovieFromTheList"
 
 const IconDelete = () => {
     return (
@@ -43,8 +43,69 @@ const IconEdit = () => {
     )
 }
 
-export default function App({isOpen, setScore, onopen, onOpenChange, score, bgColor, movieId }) {
+const moveMovie = (categories, from, to, targetId) => {
+    const newCategories = {
+        ...categories,
+        [from]: [...categories[from]],
+        [to]: [...categories[to]],
+    };
 
+    const index = newCategories[from].findIndex(item => item.id === targetId);
+    if (index === -1) return categories;
+
+    const [item] = newCategories[from].splice(index, 1);
+    newCategories[to].push(item);
+
+    return newCategories;
+};
+
+const deleteMovie = (categories, from, targetId) => {
+    const newCategories = {
+        ...categories,
+        [from]: [...categories[from]],
+    };
+
+    const index = newCategories[from].findIndex(item => item.id === targetId);
+    if (index === -1) return categories;
+
+    newCategories[from].splice(index, 1);
+
+    return newCategories;
+};
+
+
+export default function App({isOpen, setScore, onopen, onOpenChange, score, bgColor, movieId, categoryName, setCategoryName }) {
+    const { categories, setCategories, category } = useCategories();
+    const saveHandler = () => {
+        if (categoryName !== category) {
+            const updatedCategories = moveMovie(categories, categoryName, category, movieId);
+            setCategories(updatedCategories);
+            const data = {
+                movieId: movieId,
+                fromCategory: categoryName,
+                toCategory: category
+            }
+            const fetch = async () => {
+                await fetchChangeListMovie(data);
+            }
+            fetch();
+        }
+    }
+
+    const deleteHandler = () => {
+        const updatedCategories = deleteMovie(categories, categoryName, movieId);
+        setCategories(updatedCategories);
+        const data = {
+            movieId: movieId,
+            fromCategory: categoryName,
+        }
+        const fetch = async () => {
+            await fetchDeleteMovieFromTheList(data);
+        }
+        fetch();
+    }
+
+    console.log(category);
 
     return (
         <>
@@ -61,35 +122,42 @@ export default function App({isOpen, setScore, onopen, onOpenChange, score, bgCo
                         <>
                             <ModalHeader className="flex flex-col gap-1">Редактирование</ModalHeader>
                             <ModalBody>
-                                <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-1">
-                                       <span className="opacity-60">Моя оценка:  </span>
-                                       {score !== null ? (
-                                           <div
-                                               className={`py-1 px-3 text-white rounded font-bold`}
-                                               style={{backgroundColor: bgColor}}
-                                           >
-                                               {score}
-                                           </div>
-                                       ) : (
-                                           <div className="p-2 rounded font-bold">Отсутствует</div>
-                                       )}
-                                   </div>
-                                    <RateMovieButtonForProfile setScore={setScore} movieId={movieId} score={score}/>
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-1">
+                                               <span className="opacity-60">Моя оценка:  </span>
+                                               {score !== null ? (
+                                                   <div
+                                                       className={`py-1 px-3 text-white rounded font-bold`}
+                                                       style={{backgroundColor: bgColor}}
+                                                   >
+                                                       {score}
+                                                   </div>
+                                               ) : (
+                                                   <div className="p-2 rounded font-bold">Отсутствует</div>
+                                               )}
+                                        </div>
+                                        <RateMovieButtonForProfile setScore={setScore} movieId={movieId} score={score}/>
+                                    </div>
+                                    <DropdownProfileMovieCard categoryName={categoryName} setCategoryName={setCategoryName} />
                                 </div>
                             </ModalBody>
                             <ModalFooter>
                                 <Button className="text-rose-600 font-bold hover:bg-rose-200 gap-1" color="danger"
                                         variant="light" onPress={onClose}>
                                     <IconDelete/>
-                                    <div className="text">
+                                    <div
+                                        onClick={() => deleteHandler()}
+                                        className="text">
                                         Удалить
                                     </div>
                                 </Button>
                                 <Button className="text-white font-bold bg-green-400 gap-1" color="primary"
                                         onPress={onClose}>
                                     <IconSave/>
-                                    <div className="text">
+                                    <div
+                                        onClick={() => saveHandler()}
+                                        className="text">
                                         Сохранить
                                     </div>
                                 </Button>
