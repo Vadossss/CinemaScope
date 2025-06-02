@@ -1,5 +1,3 @@
-"use client"
-
 import {
     Navbar,
     NavbarBrand,
@@ -100,7 +98,7 @@ export default function App() {
                             <DropdownTrigger>
                                 <Button
                                     disableRipple
-                                    className="text-base text-gray-500 font-bold transition ease-in-out delay-100 hover:text-black duration-150 p-0 text-base bg-transparent data-[hover=true]:bg-transparent"
+                                    className="text-base text-gray-500 font-bold transition ease-in-out delay-100 hover:text-orange-500 duration-150 p-0 bg-transparent data-[hover=true]:bg-transparent"
                                     radius="sm"
                                     endContent={icons.chevron}
                                     variant="light"
@@ -138,12 +136,12 @@ export default function App() {
                         </DropdownMenu>
                     </Dropdown>
                     <NavbarItem>
-                        <Link className="text-base text-gray-500 font-bold transition ease-in-out delay-100 hover:text-black duration-150" href="/persons">
+                        <Link className="text-base text-gray-500 font-bold transition ease-in-out delay-100 hover:text-orange-500 duration-150" href="/persons">
                             Персоны
                         </Link>
                     </NavbarItem>
                     <NavbarItem>
-                        <Link className="text-base text-gray-500 font-bold transition ease-in-out delay-100 hover:text-black duration-150" href="/news">
+                        <Link className="text-base text-gray-500 font-bold transition ease-in-out delay-100 hover:text-orange-500 duration-150" href="/news">
                             Медиа
                         </Link>
                     </NavbarItem>
