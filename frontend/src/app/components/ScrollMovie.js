@@ -40,7 +40,7 @@ export default function ScrollMovie({ data }) {
                 </svg>
             </button>
             <button ref={nextRef}
-                    className="group absolute w-10 h-10 right-0 top-1/3 z-10 -translate-y-1/2 bg-white hover:bg-orange-500 transition-colors duration-300 ease-in p-2 rounded-full flex items-center justify-center">
+                    className="group absolute w-10 h-10 top-1/3 right-4 z-10 -translate-y-1/2 bg-white hover:bg-orange-500 transition-colors duration-300 ease-in p-2 rounded-full flex items-center justify-center">
                 <svg
                     xmlns='http://www.w3.org/2000/svg'
                     width='8px'
