@@ -122,6 +122,12 @@ public class UserService {
 
         return ResponseEntity.ok(response);
     }
+    
+    public ResponseEntity<Object> getUserScore(String userId) {
+        UserMongo userMongo = userMongoRepository.findById(userId).orElse(null);
+        if (userMongo == null) return ResponseEntity.status(404).body(new MessageResponse("Пользователь не существует"));
+        return ResponseEntity.ok().body(userMongo.getScores());
+    }
 
     public List<MovieMongo> recommendationForUser() {
         UserDetails currentUser = getCurrentUser();
