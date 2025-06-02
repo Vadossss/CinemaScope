@@ -3,6 +3,7 @@
 import {useEffect, useState} from "react";
 import SearchMovieCard from "./SearchMovieCard";
 import MovieProfileCard from "./MovieProfileCard";
+import {useCategories} from "@/app/contexts/categoriesMoviesContext";
 
 
 
@@ -12,14 +13,27 @@ export default function App({setUpdate, dataMovie}) {
     const [sortOption, setSortOptions] = useState("name_asc");
     const [selectedCategory, setSelectedCategory] = useState("total");
     const [sortedData, setSortedData] = useState([]);
-
-    // console.log(data);
+    const { categories, setCategories } = useCategories();
 
     useEffect(() => {
-        const watching = dataMovie.watching;
-        const planned = dataMovie.planned;
-        const watched = dataMovie.watched;
-        const dropped = dataMovie.dropped;
+        if (dataMovie) {
+            setCategories(dataMovie);
+        }
+    }, [dataMovie]);
+
+    // useEffect(() => {
+    //     console.log(categories);
+    //     dataMovie = categories;
+    // }, [categories]);
+
+
+    useEffect(() => {
+        if (!categories) return;
+
+        const watching = categories.watching ?? [];
+        const planned = categories.planned ?? [];
+        const watched = categories.watched ?? [];
+        const dropped = categories.dropped ?? [];
 
         const total = [...watched, ...watching, ...dropped, ...planned];
 
@@ -39,7 +53,7 @@ export default function App({setUpdate, dataMovie}) {
 
         const data = formatingData();
 
-        console.log(data);
+        // console.log(data);
 
         const filteredMovies = data.filter((item) =>
             item.name !== null
@@ -57,19 +71,17 @@ export default function App({setUpdate, dataMovie}) {
         });
 
         setSortedData(sortData);
-    }, [searchText, sortOption, selectedCategory]);
+    }, [searchText, sortOption, selectedCategory, categories]);
 
     const sort = [
         {name: "По названию (A-Z)", value: "name_asc"},
         {name: "По названию (Z-A)", value: "name_desc"},
     ]
 
-
-
-    const watching = dataMovie.watching.length;
-    const planned = dataMovie.planned.length;
-    const watched = dataMovie.watched.length;
-    const dropped = dataMovie.dropped.length;
+    const watching = categories?.watching?.length || 0;
+    const planned = categories?.planned?.length || 0;
+    const watched = categories?.watched?.length || 0;
+    const dropped = categories?.dropped?.length || 0;
 
     const total = watching + planned + watched + dropped;
 
@@ -86,12 +98,12 @@ export default function App({setUpdate, dataMovie}) {
 
     return (
         <div className="flex gap-6">
-            <div className="flex flex-col w-[230px] bg-gray-100 rounded-xl p-4 px-2 self-start">
+            <div className="flex flex-col w-[230px] bg-gray-100 rounded-xl p-4 px-2 self-start shadow-md shadow-orange-500">
                 <div className="text-black opacity-75 text-sm ml-2 mb-3 relative">
                     <div className=" bg-gray-100 mb-1">Списки</div>
                     <div className="absolute opacity-45 border-t-2 -left-4  border-black ml-0 p-0 w-[230px]"></div>
                 </div>
-                <div>
+                <div className="flex flex-col gap-1">
                     {catalogs.map((item, index) => (
                         <div key={index}
                              className={`flex p-2 rounded-md text-black transition duration-1 cursor-pointer 50 ease-in-out
@@ -103,7 +115,7 @@ export default function App({setUpdate, dataMovie}) {
                         </div>
                     ))}
                 </div>
-                <div className="text-black ml-2 mb-3 mt-4 relative">
+                <div className="text-black opacity-75 ml-2 mb-3 mt-4 relative">
                     <div className=" bg-gray-100 mb-1 text-sm">Сортировка</div>
                     <div className="absolute opacity-45 border-t-2 -left-4  border-black ml-0 p-0 w-[230px]"></div>
                 </div>
@@ -126,7 +138,7 @@ export default function App({setUpdate, dataMovie}) {
             {sortedData.length > 0 ? (
                 <div className="grid grid-cols-8 gap-2 ">
                     {sortedData.map((movie, index) => (
-                        <MovieProfileCard key={index} setUpdate={setUpdate} data={movie}/>
+                        <MovieProfileCard key={movie.id} setUpdate={setUpdate} data={movie} dataCategory={dataMovie}/>
                     ))}
                 </div>
             ) : (
