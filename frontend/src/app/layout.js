@@ -8,7 +8,6 @@ import { Amatic_SC } from "next/font/google";
 import { HeroUIProvider } from '@heroui/react'
 import { ToastProvider } from "@heroui/toast";
 import Footer from "../app/components/Footer";
-import { PlayerProvider } from 'next-playerjs-wrapper';
 import {
   useQuery,
   useMutation,
@@ -16,6 +15,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
+import {useEffect} from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,6 +42,10 @@ export default function RootLayout({ children }) {
 
   const queryClient = new QueryClient();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <html lang="en">
       <body
@@ -50,13 +54,11 @@ export default function RootLayout({ children }) {
         <QueryClientProvider client={queryClient}>
             <AuthProvider>
               <Navbar />
-              <PlayerProvider player='/playerjs.js'>
                 <HeroUIProvider>
                   <ToastProvider />
                     <div className="mt-6 flex flex-col items-center min-h-[calc(96vh-4rem)]">{children}</div>
                   <Footer />
                 </HeroUIProvider>
-              </PlayerProvider>
             </AuthProvider>
         </QueryClientProvider>
         </body>
