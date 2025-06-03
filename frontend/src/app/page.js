@@ -52,6 +52,10 @@ export default function Home() {
   }, [hasChosenGenres]);
 
   useEffect(() => {
+    if (hasChosenGenres === null || hasChosenGenres === false) {
+      setLoadingRecommendation(false);
+      return;
+    }
     const fetchData = async () => {
       const res = await fetchWithAuth("/user/userPersonalCatalog?page=1&size=250",
           {
@@ -74,7 +78,7 @@ export default function Home() {
     };
 
     fetchData();
-  }, []);
+  }, [hasChosenGenres]);
 
   if (isLoadingPopular || isLoadingRecommendation) {
     return (
