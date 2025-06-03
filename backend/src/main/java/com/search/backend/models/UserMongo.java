@@ -27,6 +27,7 @@ public class UserMongo {
     private Map<Long, Score> scores = new HashMap<>();
     private boolean hasChosenGenres = false;
     private Instant lastDismissedGenresAt;
+    private String avatarPath;
 
     @Getter
     @Setter
