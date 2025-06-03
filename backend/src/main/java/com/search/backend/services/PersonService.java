@@ -8,10 +8,13 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class PersonService {
@@ -53,5 +56,11 @@ public class PersonService {
             return ResponseEntity.status(404).body("Person not found");
         }
         return ResponseEntity.ok(person);
+    }
+
+    public List<PersonMongo> searchByNameRegex(String name, int limit) {
+        Criteria criteria = Criteria.where("name").regex(name, "i");
+        Query query = new Query(criteria).limit(limit);
+        return mongoTemplate.find(query, PersonMongo.class);
     }
 }
