@@ -119,6 +119,7 @@ public class UserService {
         response.put("favoriteGenres", user.getFavoriteGenres());
         response.put("categorizedMovies", categorizedMovies);
         response.put("scoredMovies", scoredMovies);
+        response.put("avatarUrl", user.getAvatarPath());
 
         return ResponseEntity.ok(response);
     }
