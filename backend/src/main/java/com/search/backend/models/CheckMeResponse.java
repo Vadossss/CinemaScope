@@ -17,6 +17,7 @@ public class CheckMeResponse {
     private String role;
     private Map<Long, UserMongo.Score> scores;
     private Map<String, List<String>> categories;
+    private String avatarUrl;
     private boolean hasChosenGenres;
     private Instant lastDismissedGenresAt;
 }
