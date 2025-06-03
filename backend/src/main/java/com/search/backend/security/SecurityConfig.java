@@ -42,7 +42,7 @@ public class SecurityConfig {
                                 "/auth/debugRoles", "/films/movie", "/films/getMovieById",
                                 "/comments/getCommentsForMovie", "films/popularNow", "/films/findByRegex",
                                 "/person/getPersons", "/person/findPersonByID","news/save", "/news/getNews",
-                                "/user/getUserProfile", "/admin/findByName").permitAll()
+                                "/user/getUserProfile", "/admin/findByName", "/person/findByName", "/person/findByRegex").permitAll()
                         .anyRequest().authenticated()
                 )
 
