@@ -34,10 +34,12 @@ public class AdminController {
 
     @GetMapping("/findByName")
     public List<ForAdminInfoModel> findByName(@RequestParam String name, @RequestParam(defaultValue = "10") int limit) {
-        List<AppUser> users = userRepository.findByUsernameContainingIgnoreCase(name);
-        return users.stream().map(user->{
-            return new ForAdminInfoModel(user.getId(), user.getUsername(), user.getRole());
-        }).collect(Collectors.toList());
+        List<AppUser> users = userRepository.findByUsernameContainingIgnoreCase(name)
+                .stream().limit(limit).toList();
+
+        return users.stream()
+                .map(user -> new ForAdminInfoModel(user.getId(), user.getUsername(), user.getRole()))
+                .collect(Collectors.toList());
     }
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("/setRole")
