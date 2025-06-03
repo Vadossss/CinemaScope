@@ -35,7 +35,7 @@ const items = [
 ];
 
 export default function App() {
-    const { auth, username, userId, setAuth } = useAuth();
+    const { auth, username, userId, avatar, setAuth } = useAuth();
     const [isLoading, setLoading] = useState(true);
     const router  = useRouter();
 
@@ -76,7 +76,7 @@ export default function App() {
                         as="button"
                         avatarProps={{
                             isBordered: true,
-                            src: "/icon_avatar1.png",
+                            src: avatar !== null ? avatar : "/icon_avatar1.png",
                         }}
                         className="transition-transform"
                     />
@@ -86,7 +86,7 @@ export default function App() {
                         <User
                             avatarProps={{
                                 size: "sm",
-                                src: "/icon_avatar1.png",
+                                src: avatar !== null ? avatar : "/icon_avatar1.png",
                             }}
                             classNames={{
                                 name: "text-default-600",
