@@ -8,6 +8,8 @@ import {Spinner} from "@heroui/react";
 import {fetchPopularMovie} from "@/app/utils/fetchPopularMovie";
 import {fetchWithAuth} from "@/app/utils/fetchWithAuth";
 import GenesModal from "./components/GenresModal";
+import { NewsCard } from "./components/NewsCard";
+import { getNews } from "./utils/fetchGetAllNews";
 
 export default function Home() {
   const [isLoadingPopular, setLoadingPopular] = useState(true);
@@ -16,6 +18,7 @@ export default function Home() {
   const [movieRecommendationData, setMovieRecommendationData] = useState(null);
   const { auth, hasChosenGenres, lastDismissed  } = useAuth();
   const [showGenreModal, setShowGenreModal] = useState(false);
+  const [latestNews, setLatestNews] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,6 +26,13 @@ export default function Home() {
       console.log(result);
       setMoviePopularData(result);
       setLoadingPopular(false);
+      const [newsData, newsError] = await getNews(0, 6);
+      if (newsError) {
+        console.error(newsError);
+        setLatestNews([]);
+      } else {
+        setLatestNews(newsData?.content || []);
+      }
     };
 
     fetchData();
@@ -88,11 +98,38 @@ export default function Home() {
     )
   }
 
+  const bigIndexes = [0, 5];
+
   return (
     <div className="w-[1600px] bg-white flex flex-col items-center rounded-xl gap-4 min-h-screen pt-8">
       <GenesModal showGenreModal={showGenreModal} />
       <PopularMovieSwiper movieData={moviePopularData} />
       {auth && <RecommendationSwiper movieData={movieRecommendationData} />}
+<div className="mt-16 w-full">
+  <h2 className="text-xl text-center font-semibold mb-4">Последние новости</h2>
+  {latestNews.length > 0 ? (
+    <div className="grid grid-cols-4 gap-2 ml-4 mr-4 mb-4">
+      {latestNews.map((item, index) => {
+        const isBig = bigIndexes.includes(index);
+
+        return (
+          <div
+            key={item.id || index}
+            className={`news-item ${
+              isBig ? "big-card" : ""
+            } ${index === 0 ? "col-span-2 row-start-1" : ""} ${
+              index === 5 ? "col-span-2 row-start-2" : ""
+            }`}
+          >
+            <NewsCard item={item} index={index} isBig={isBig} />
+          </div>
+        );
+      })}
+    </div>
+  ) : (
+    <p>Новостей пока нет.</p>
+  )}
+</div>
     </div>
   );
 }

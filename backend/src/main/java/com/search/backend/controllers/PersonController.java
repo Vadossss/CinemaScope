@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 
 import java.io.IOException;
+import java.util.List;
 
 
 @RestController
@@ -58,6 +59,17 @@ public class PersonController {
     public ResponseEntity<Object> getPersonByID(@RequestParam Long id) {
         System.out.println(id);
         return personService.getPersonByID(id);
+    }
+    @GetMapping("/findByName")
+    public List<PersonMongo> findName(@RequestParam String name) {
+        return personRepository.findByName(name);
+    }
+
+    @GetMapping("/findByRegex")
+    public List<PersonMongo> getSearchByRegex(
+            @RequestParam String regex,
+            @RequestParam(defaultValue = "10") int limit) {
+        return personService.searchByNameRegex(regex, limit);
     }
 
 

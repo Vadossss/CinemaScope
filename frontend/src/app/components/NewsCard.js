@@ -7,9 +7,8 @@ function formatDate(dateString) {
   }).format(date);
 }
 
-export function NewsCard({ item, index }) {
-  const isWideCard = [0, 13, 22, 35].includes(index);
-
+export function NewsCard({ item, index, isBig }) {
+  const isWideCard = isBig;
   return (
     <>
     {isWideCard ? (

@@ -1,6 +1,7 @@
 package com.search.backend.services;
 
 import ch.qos.logback.core.net.server.Client;
+import com.search.backend.models.MovieMongo;
 import com.search.backend.models.NewsMongo;
 import com.search.backend.models.PersonMongo;
 import okhttp3.OkHttpClient;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class NewsService {
@@ -58,5 +60,7 @@ public class NewsService {
 
         return ResponseEntity.ok(news);
     }
+
+
 
 }

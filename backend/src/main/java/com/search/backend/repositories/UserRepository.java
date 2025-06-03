@@ -19,6 +19,6 @@ public interface UserRepository extends JpaRepository<AppUser, Integer> {
     @Transactional
     void deleteByUsername(String username);
 
-    List<AppUser> findByUsernameRegexIgnoreCase(String regex);
+    List<AppUser> findByUsernameContainingIgnoreCase(String regex);
 }
 

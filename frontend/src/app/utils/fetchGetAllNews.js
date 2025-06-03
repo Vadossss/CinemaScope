@@ -9,7 +9,7 @@ export async function getNews(page, size = 40) {
     });
 
     if (res.ok) {
-      return [await res.json(), null]; // ✔️ success
+      return [await res.json(), null]; // success
     } else if (res.status === 404) {
       console.log("Ошибка 404");
       return [null, new Error("Новости не найдены")];
@@ -19,6 +19,6 @@ export async function getNews(page, size = 40) {
     }
   } catch (error) {
     console.log("Ошибка при запросе:", error);
-    return [null, error]; // ✔️ error object
+    return [null, error]; //error object
   }
 }

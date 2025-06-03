@@ -64,6 +64,7 @@ export default function NewsPage() {
     )
   }
 
+  const bigIndexes = [0, 13, 22, 35];
   return (
     <div className="bg-gray-100 py-8 px-8 rounded-xl w-[1600px]">
       <div className="mx-auto">
@@ -72,8 +73,8 @@ export default function NewsPage() {
         </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
-          {news.map((item, index) => (
-            <NewsCard key={item.id || index} item={item} index={index} />
+          {news.map((item, index, isBig) => (
+            <NewsCard key={item.id || index} item={item} index={index} isBig={bigIndexes.includes(index)} />
           ))}
         </div>
 
