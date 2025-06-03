@@ -6,16 +6,18 @@ import {useAuth} from "@/app/contexts/authContext";
 import {useEffect, useState} from "react";
 
 export default function App({ data }) {
-    const { categories } = useAuth();
+    const { categories, auth } = useAuth();
     const [isAddToLists, setIsAddToLists] = useState(false);
 
     // console.log(data.id);
 
     useEffect(() => {
-        setIsAddToLists(Object.values(categories).some(list => {
-               return list.includes(String(data.id));
-            }
-        ));
+        if (auth !== false && auth !== null) {
+            setIsAddToLists(Object.values(categories).some(list => {
+                    return list.includes(String(data.id));
+                }
+            ));
+        }
     }, [categories, data.id])
 
     const ratingColor = data.rating.kp > 7.1 ? "#3bb33b" : data.rating.kp > 4.1 ? "#777" : "#ff1414";
@@ -24,7 +26,7 @@ export default function App({ data }) {
 
     return (
         <div className="w-[150px] group/item">
-            {!isAddToLists && (
+            {!isAddToLists && auth && (
                 <div
                     className={`group absolute z-10 top-[7px] right-4 pr-2 pl-2 text-sm
                      rounded-sm invisible group-hover/item:visible`}>
