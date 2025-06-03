@@ -5,6 +5,8 @@ import {SearchIcon} from "@/app/components/Navbar";
 import {fetchSearchByRegex} from "@/app/utils/fetchSearchByRegex";
 import {useEffect, useRef, useState} from "react";
 import SearchMovieCard from "./SearchMovieCard"
+import { fetchSearchPersonByRegex } from "../utils/fetchSearchPersonByRegex";
+import SearchPersonCard from "./SearchPersonCard";
 
 export default function App() {
     const [input, setInput] = useState("");
@@ -12,6 +14,7 @@ export default function App() {
     const [isLoading, setLoading] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
     const containerRef = useRef(null);
+    const [persons, setPersons] = useState([]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -26,27 +29,32 @@ export default function App() {
     }, []);
 
     useEffect(() => {
-        if (!input.trim()) {
-            setData(null); // Очищаем, если строка пуста
-            return;
-        }
+  if (!input.trim()) {
+    setData(null);
+    setPersons([]);
+    return;
+  }
 
-        setLoading(true);
+  setLoading(true);
 
-        const delayDebounce = setTimeout(() => {
-            fetchSearchByRegex(input)
-                .then(([result]) => {
-                    setData(result);
-                    setLoading(false);
-                })
-                .catch((error) => {
-                    console.error("Ошибка при поиске:", error);
-                    setLoading(false);
-                });
-        }, 500); // Задержка 500мс после последнего ввода
+  const delayDebounce = setTimeout(() => {
+            Promise.all([
+            fetchSearchByRegex(input),      // фильмы и сериалы
+            fetchSearchPersonByRegex(input) // персоны
+            ])
+            .then(([movieResult, personResult]) => {
+                setData(movieResult[0]);      // movies и series
+                setPersons(personResult[0]);  // персоны
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error("Ошибка при поиске:", error);
+                setLoading(false);
+            });
+        }, 500);
 
-        return () => clearTimeout(delayDebounce); // Сброс предыдущего таймера
-    }, [input]);
+        return () => clearTimeout(delayDebounce);
+        }, [input]);
 
     console.log(data);
 
@@ -112,9 +120,15 @@ export default function App() {
 
                             <Tab className="w-full" key="persons" title="Персоны">
                                 <div className="relative flex flex-col gap-1 w-full max-h-[400px] overflow-y-auto pr-2">
+                                    {persons && persons.length > 0 ? (
+                                    persons.map(person => (
+                                        <SearchPersonCard key={person.id} person={person} />
+                                    ))
+                                    ) : (
                                     <div className="h-40 flex justify-center items-center w-full text-center">
-                                        Здесь будут персоны...
+                                        Мы ничего не нашли :(
                                     </div>
+                                    )}
                                 </div>
                             </Tab>
                         </Tabs>
