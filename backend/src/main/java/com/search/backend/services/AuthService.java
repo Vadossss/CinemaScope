@@ -80,10 +80,10 @@ public class AuthService {
     @Transactional
     public ResponseEntity<Object> registerUser(AppUser user) {
         if (userRepository.existsByUsername(user.getUsername())) {
-            return ResponseEntity.status(401).body("Username already exists");
+            return ResponseEntity.status(401).body("Логин уже используется");
         }
         if (userRepository.existsByEmail(user.getEmail())) {
-            return ResponseEntity.status(401).body("Email already exists");
+            return ResponseEntity.status(401).body("Email уже используется");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
