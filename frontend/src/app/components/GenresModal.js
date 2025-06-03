@@ -54,6 +54,7 @@ export default function App({showGenreModal}) {
     const [isOpen, setIsOpen] = useState(false);
     const [genresArray, setGenresArray] = useState([]);
     const { setHasChosenGenres, setLastDismissed } = useAuth();
+    const [isDisabledButton, setIsDisabledButton] = useState(true);
 
     const modalButtonHandler = (genre) => {
         if (genresArray.includes(genre)) {
@@ -63,6 +64,15 @@ export default function App({showGenreModal}) {
             setGenresArray([...genresArray, genre]);
         }
     }
+
+    useEffect(() => {
+        if (genresArray.length > 0) {
+            setIsDisabledButton(false);
+        }
+        else {
+            setIsDisabledButton(true);
+        }
+    }, [genresArray]);
 
     useEffect(() => {
         console.log(genresArray);
@@ -111,6 +121,7 @@ export default function App({showGenreModal}) {
                                     Потом
                                 </Button>
                                 <Button
+                                    isDisabled={isDisabledButton}
                                     color="primary"
                                     onPress={async () => {
                                         await fetchGenresModal(genresArray);
