@@ -7,7 +7,7 @@ export default function MoviePersonList({filmData, title, filterValue, descripti
         {filmData.persons !== null && filmData.persons.filter(p => p.profession === filterValue).length > 0 &&
             <div className="flex flex-col mb-6">
                 <div className="mb-2">
-                    <Link className="flex gap-2" href={`/films/${filmData.id}/cast`}>
+                    <Link className="flex gap-2" href={filmData.isSeries ? `/series/${filmData.id}/cast` : `/films/${filmData.id}/cast`}>
                         <h3 className="font-bold text-sm">{title}</h3>
                         <img src="/icon_next.svg" alt={"next"}/>
                     </Link>
