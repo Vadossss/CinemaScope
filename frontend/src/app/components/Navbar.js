@@ -12,6 +12,22 @@ import {
 import Link from "next/link";
 import ButtonNavbar from "@/app/components/ButtonNavbar";
 import NavbarSearch from "@/app/components/NavbarSearch";
+import { fetchMovies } from "../utils/fetchMovies";
+import CatalogPage from "../catalog/[catalogName]/page";
+import { useRouter } from "next/navigation";
+
+
+const handleFetchByType = async (type)=>{
+    const router = useRouter();
+    const[data, error] = await fetchMovies(type);
+    router.push(`/catalog/${type}`)
+    if(error){
+        console.error("Ошибка при загрузке", error);
+    }
+    else{
+        console.log("Результат для типа:", type, data);
+    }
+}
 
 export const AcmeLogo = () => {
     return (
@@ -113,24 +129,16 @@ export default function App() {
                                 base: "gap-4",
                             }}
                         >
-                            <DropdownItem
-                                key="autoscaling"
-                            >
+                            <DropdownItem key="movie" href="/catalog/movie">
                                 Кино
                             </DropdownItem>
-                            <DropdownItem
-                                key="usage_metrics"
-                            >
+                            <DropdownItem key="tv-series" href="/catalog/tv-series">
                                 Сериалы
                             </DropdownItem>
-                            <DropdownItem
-                                key="production_ready"
-                            >
+                            <DropdownItem key="anime" href="/catalog/anime">
                                 Аниме
                             </DropdownItem>
-                            <DropdownItem
-                                key="99_uptime"
-                            >
+                            <DropdownItem key="cartoon" href="/catalog/cartoon">
                                 Мультфильмы
                             </DropdownItem>
                         </DropdownMenu>
