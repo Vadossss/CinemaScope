@@ -1,4 +1,4 @@
-package com.search.backend.repositories;
+package com.search.backend.repositories.jpa;
 
 import com.search.backend.models.AppUser;
 import jakarta.transaction.Transactional;
