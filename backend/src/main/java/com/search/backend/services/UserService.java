@@ -2,9 +2,9 @@ package com.search.backend.services;
 
 import com.mongodb.client.result.UpdateResult;
 import com.search.backend.models.*;
-import com.search.backend.repositories.CommentRepository;
-import com.search.backend.repositories.MovieRepositoryMongo;
-import com.search.backend.repositories.UserMongoRepository;
+import com.search.backend.repositories.mongo.CommentRepository;
+import com.search.backend.repositories.mongo.MovieRepositoryMongo;
+import com.search.backend.repositories.mongo.UserMongoRepository;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -213,7 +213,7 @@ public class UserService {
             scores.put(id, new UserMongo.Score(score));
             userMongo.setScores(scores);
             userMongoRepository.save(userMongo);
-            return ResponseEntity.ok().body("Оценка обновлена");
+            return ResponseEntity.ok().body(new NewScoreResponse(score, false));
         }
         else {
             Update update = new Update()
@@ -224,7 +224,7 @@ public class UserService {
             scores.put(id, new UserMongo.Score(score));
             userMongo.setScores(scores);
             userMongoRepository.save(userMongo);
-            return ResponseEntity.ok().body("Оценка добавлена");
+            return ResponseEntity.ok().body(new NewScoreResponse(score, true));
         }
     }
 
