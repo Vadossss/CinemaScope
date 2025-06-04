@@ -21,14 +21,6 @@ const items = [
         label: "Мой профиль",
     },
     {
-        key: "grades",
-        label: "Оценки",
-    },
-    {
-        key: "settings",
-        label: "Настройки",
-    },
-    {
         key: "logout",
         label: "Выйти",
     },
@@ -82,7 +74,7 @@ export default function App() {
                     />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Dynamic Actions">
-                    <DropdownItem key="me" isReadOnly className="h-12 gap-2 opacity-100">
+                    <DropdownItem href={`/user/${userId}`} key="me" isReadOnly className="h-12 gap-2 opacity-100">
                         <User
                             avatarProps={{
                                 size: "sm",
