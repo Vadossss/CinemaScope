@@ -1,6 +1,5 @@
 package com.search.backend.services;
 
-import com.search.backend.exception.FileStorageException;
 import com.search.backend.models.*;
 import com.search.backend.repositories.UserMongoRepository;
 import com.search.backend.repositories.UserRepository;
