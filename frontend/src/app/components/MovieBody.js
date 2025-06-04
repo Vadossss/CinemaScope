@@ -2,7 +2,7 @@ import Link from "next/link";
 import PersonFilmLike from "@/app/components/PersonFilmLink";
 import MoviePersonList from "@/app/components/MoviePersonList";
 
-export default function App({ filmData }) {
+export default function App({ filmData, description }) {
 
     const formatPersons = (professionRu, professionEn) => {
         const persons = filmData?.persons?.filter(p =>
@@ -69,50 +69,49 @@ export default function App({ filmData }) {
     ];
 
     return (
-        <div className="flex gap-10 pt-10">
-            <div className="w-[600px]">
-                <h1 className="mb-2">
-                    <span className="text-xl font-bold">О фильме</span>
-                </h1>
+        <div className="flex flex-col lg-custom:flex-row gap-10 pt-10 max-w-screen-xl">
+            <div className="flex-shrink-0 w-full lg:w-[600px]">
+                <h1 className="mb-2 text-xl font-bold">{description}</h1>
 
-                {categories.filter(cat => cat.value).map((data, index) => (
-                    <div key={index} className="flex mb-1">
-                        <div className="w-[160px]">
-                            <span className="text-sm text-gray-500">{data.name}</span>
+                {categories
+                    .filter((cat) => cat.value)
+                    .map((data, index) => (
+                        <div key={index} className="flex mb-1">
+                            <div className="w-40 min-w-[160px]">
+                                <span className="text-sm text-gray-500">{data.name}</span>
+                            </div>
+                            <div className="flex-1">
+                                <span className="text-sm">{data.value}</span>
+                            </div>
                         </div>
-                        <div className="flex-1">
-                            <span className="text-sm">{data.value}</span>
-                        </div>
-                    </div>
-                ))}
+                    ))}
 
                 {filmData?.ageRating && (
                     <div className="flex mb-1">
-                        <div className="w-[160px]">
+                        <div className="w-40 min-w-[160px]">
                             <span className="text-sm text-gray-500">Возраст</span>
                         </div>
                         <div className="flex-1">
-                            <span className="text-sm border-2 pl-1 pr-1">{filmData.ageRating + '+'}</span>
+                            <span className="text-sm border-2 px-1">{filmData.ageRating + "+"}</span>
                         </div>
                     </div>
                 )}
             </div>
 
-            <div>
-                <div className="w-[160px]">
-                    <MoviePersonList
-                        filmData={filmData}
-                        title="В главных ролях"
-                        filterValue="актеры"
-                        description="актёров"
-                    />
-                    <MoviePersonList
-                        filmData={filmData}
-                        title="Роли дублировали"
-                        filterValue="актеры дубляжа"
-                        description="актёров"
-                    />
-                </div>
+            <div className="flex-shrink-0 w-full lg:w-[160px]">
+                <MoviePersonList
+                    filmData={filmData}
+                    title="В главных ролях"
+                    filterValue="актеры"
+                    description="актёров"
+                />
+                <MoviePersonList
+                    filmData={filmData}
+                    title="Роли дублировали"
+                    filterValue="актеры дубляжа"
+                    description="актёров"
+                    className="mt-6"
+                />
             </div>
         </div>
     );
