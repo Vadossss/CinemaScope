@@ -2,9 +2,8 @@ package com.search.backend.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.search.backend.models.MovieMongo;
 import com.search.backend.models.PersonMongo;
-import com.search.backend.repositories.PersonRepositoryMongo;
+import com.search.backend.repositories.mongo.PersonRepositoryMongo;
 import com.search.backend.services.PersonService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

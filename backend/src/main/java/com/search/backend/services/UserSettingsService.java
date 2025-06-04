@@ -1,8 +1,8 @@
 package com.search.backend.services;
 
 import com.search.backend.models.*;
-import com.search.backend.repositories.UserMongoRepository;
-import com.search.backend.repositories.UserRepository;
+import com.search.backend.repositories.mongo.UserMongoRepository;
+import com.search.backend.repositories.jpa.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -12,8 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -21,7 +19,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.*;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service

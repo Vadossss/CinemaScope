@@ -1,7 +1,7 @@
 package com.search.backend.security;
 
 import com.search.backend.models.AppUser;
-import com.search.backend.repositories.UserRepository;
+import com.search.backend.repositories.jpa.UserRepository;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

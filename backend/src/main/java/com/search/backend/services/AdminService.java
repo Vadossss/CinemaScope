@@ -3,12 +3,11 @@ package com.search.backend.services;
 import com.search.backend.models.AppUser;
 import com.search.backend.models.AppUserRole;
 import com.search.backend.models.CommentMongo;
-import com.search.backend.repositories.CommentRepository;
-import com.search.backend.repositories.UserRepository;
+import com.search.backend.repositories.mongo.CommentRepository;
+import com.search.backend.repositories.jpa.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 import java.util.Optional;

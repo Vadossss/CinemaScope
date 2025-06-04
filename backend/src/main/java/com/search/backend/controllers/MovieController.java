@@ -3,7 +3,7 @@ package com.search.backend.controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.backend.models.*;
-import com.search.backend.repositories.MovieRepositoryMongo;
+import com.search.backend.repositories.mongo.MovieRepositoryMongo;
 import com.search.backend.services.FilmService;
 import com.search.backend.services.UserService;
 import org.springframework.http.ResponseEntity;

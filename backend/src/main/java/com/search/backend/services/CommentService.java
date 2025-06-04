@@ -1,7 +1,7 @@
 package com.search.backend.services;
 
 import com.search.backend.models.CommentMongo;
-import com.search.backend.repositories.CommentRepository;
+import com.search.backend.repositories.mongo.CommentRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;

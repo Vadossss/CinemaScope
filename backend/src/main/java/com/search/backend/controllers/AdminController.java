@@ -3,10 +3,9 @@ package com.search.backend.controllers;
 import com.search.backend.models.AppUser;
 import com.search.backend.models.ForAdminInfoModel;
 import com.search.backend.models.SetRoleRequest;
-import com.search.backend.models.UserMongo;
-import com.search.backend.repositories.UserRepository;
+import com.search.backend.repositories.mongo.UserMongoRepository;
+import com.search.backend.repositories.jpa.UserRepository;
 import com.search.backend.services.AdminService;
-import org.apache.kafka.clients.admin.Admin;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +19,12 @@ public class AdminController {
 
     private final AdminService adminService;
     private UserRepository userRepository;
+    private final UserMongoRepository userMongoRepository;
 
-    public AdminController(AdminService adminService, UserRepository userRepository) {
+    public AdminController(AdminService adminService, UserRepository userRepository, UserMongoRepository userMongoRepository) {
         this.adminService = adminService;
         this.userRepository = userRepository;
+        this.userMongoRepository = userMongoRepository;
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")

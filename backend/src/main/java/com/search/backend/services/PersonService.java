@@ -1,8 +1,6 @@
 package com.search.backend.services;
 
-import com.search.backend.models.MovieMongo;
 import com.search.backend.models.PersonMongo;
-import com.search.backend.repositories.UserMongoRepository;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
