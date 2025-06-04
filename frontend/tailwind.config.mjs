@@ -10,6 +10,9 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        'lg-custom': '1025px',
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
