@@ -100,7 +100,7 @@ public class FilmService {
 
 
     public List<MovieMongo> findMoviesInRange(MovieParamsSearch movieParamsSearch) {
-        Query query = new Query().limit(30);
+        Query query = new Query().limit(3000);
         if (movieParamsSearch.getReleaseYearsStart() != null && movieParamsSearch.getReleaseYearsEnd() != null) {
             query.addCriteria(Criteria.where("year").gte(movieParamsSearch.getReleaseYearsStart())
             .lte(movieParamsSearch.getReleaseYearsEnd()));
@@ -117,13 +117,13 @@ public class FilmService {
         if (movieParamsSearch.getStatus() != null) {
             formatingMultipleParameters(query, movieParamsSearch.getStatus(), "status");
         }
-//        if (movieParamsSearch.getTypes() != null) {
-//            formatingMultipleParameters(query, movieParamsSearch.getTypes(), "type");
-//        }
-        if (movieParamsSearch.getGenres() != null && !movieParamsSearch.getGenres().isEmpty()) {
-            formatingMultipleParameters(query, movieParamsSearch.getGenres(), "genres.name");
-//            query.addCriteria(Criteria.where("genres.name").all(movieParamsSearch.getGenres()));
+        if (movieParamsSearch.getTypes() != null) {
+            formatingMultipleParameters(query, movieParamsSearch.getTypes(), "type");
         }
+//        if (movieParamsSearch.getGenres() != null && !movieParamsSearch.getGenres().isEmpty()) {
+//            formatingMultipleParameters(query, movieParamsSearch.getGenres(), "genres.name");
+////            query.addCriteria(Criteria.where("genres.name").all(movieParamsSearch.getGenres()));
+//        }
 //        if (movieParamsSearch.getCountries() != null) {
 //            formatingMultipleParameters(query, movieParamsSearch.getCountries(), "countries.name");
 //        }
