@@ -7,6 +7,7 @@ export async function getNews(page, size = 40) {
         "Content-Type": "application/json",
       },
     });
+    
 
     if (res.ok) {
       return [await res.json(), null]; // success
