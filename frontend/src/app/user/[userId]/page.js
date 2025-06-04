@@ -14,6 +14,7 @@ import MovieListForUser from "../../components/MovieListForUser";
 import {CategoriesContextProvider} from "@/app/contexts/categoriesMoviesContext";
 import {useAuth} from "@/app/contexts/authContext";
 import SettingsModal from "../../components/SettingsModal";
+import GenresModal from "@/app/components/GenresModal";
 
 const App = () => {
     const [userData, setUserData] = useState(null);
@@ -64,20 +65,22 @@ const App = () => {
             <main className="container mx-auto px-4 py-10">
                 <div
                     className="bg-blue-950 bg-opacity-60 rounded-xl p-6 mb-5 backdrop-blur-sm shadow-lg shadow-orange-500">
-                    <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-                        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-orange-500 shadow-lg">
+                    <div className="flex flex-col md:flex-row items-center md:items-start gap-6 w-full">
+                        <div
+                            className="w-32 h-32 rounded-full overflow-hidden border-4 border-orange-500 shadow-lg shrink-0">
                             <img src={getAvatarSrc()} alt="User Avatar"
                                  className="w-full h-full object-cover"/>
                         </div>
-                        <div className="flex flex-col space-y-4">
-                            <h2 className="text-2xl md:text-3xl font-bold">{userData.user}</h2>
-                            {userId === paramsUserId && (
-                                <SettingsModal />
-                            )}
-                            <div className="flex gap-1">
-                                {/*<p className="text-white opacity-95 max-w-lg">Любимые жанры: </p>*/}
-                                {/*<span className="font-bold text-orange-500">{user.favoriteGenres.join(", ")}</span>*/}
+
+                        <div className="flex justify-between flex-1">
+                            <div className="flex flex-col space-y-4">
+                                <h2 className="text-2xl md:text-3xl font-bold">{userData.user}</h2>
+                                <GenresModal isUseButton={true} />
                             </div>
+
+                            {userId === paramsUserId && (
+                                <SettingsModal/>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -92,7 +95,7 @@ const App = () => {
                     }}
                     aria-label="Tabs variants" variant="underlined">
                     <Tab className="px-0" key="view" title="Обзор">
-                        <section className="mb-12 mt-4 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <section className="mb-12 mt-4 grid grid-cols-1 lg:grid-cols-2 gap-8">
 
 
                             <div className="bg-blue-950 bg-opacity-60 rounded-xl p-6 shadow-lg">
