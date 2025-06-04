@@ -4,7 +4,7 @@ import { fetchNewCommentForFilm } from "@/app/utils/fetchNewScoreForFilm";
 import {useAuth} from "@/app/contexts/authContext";
 import {useRouter} from "next/navigation";
 
-export default function App({ movieId }) {
+export default function App({ setNewCount, setScore, movieId }) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [rating, setRating] = useState(0);
     const { auth } = useAuth();
@@ -15,6 +15,8 @@ export default function App({ movieId }) {
         const body = {id: movieId, score: rating};
         console.log(body);
         const res = await fetchNewCommentForFilm(body);
+        setNewCount(res.newCount);
+        setScore(res.value);
         onOpenChange(false);
     };
 
@@ -44,7 +46,7 @@ export default function App({ movieId }) {
                                         <button
                                             key={star}
                                             onClick={() => setRating(star)}
-                                            className={`text-2xl ${star <= rating ? "text-yellow-400" : "text-gray-400"}`}
+                                            className={`text-2xl ${star <= rating ? "text-orange-500" : "text-gray-400"}`}
                                         >
                                             ★
                                         </button>
@@ -58,7 +60,7 @@ export default function App({ movieId }) {
                                 <Button
                                     color="primary"
                                     onPress={handleRate}
-                                    isDisabled={rating === 0} // блокируем кнопку, если оценка не выбрана
+                                    isDisabled={rating === 0}
                                 >
                                     Оценить
                                 </Button>
