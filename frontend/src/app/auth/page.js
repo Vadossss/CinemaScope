@@ -4,7 +4,7 @@ import React from "react";
 import { Form, Input, Button } from "@heroui/react";
 import { Tabs, Tab, Link, Card, CardBody } from "@heroui/react";
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../contexts/authContext";
 import { fetchLogin } from "../utils/fetchLogin"
 
@@ -81,8 +81,6 @@ export default function Auth() {
     const [emailRegister, setEmailRegister] = useState("");
     const [passwordRegister, setPasswordRegister] = useState("");
     const [errorsRegister, setErrorsRegister] = useState({ login: "", password: "", email: "" });
-    const searchParams = useSearchParams();
-    const from = searchParams.get("from");
 
     const [isVisible, setIsVisible] = React.useState(false);
 
@@ -182,7 +180,7 @@ export default function Auth() {
                         <Tab key="login" title="Войти" >
                             <Form
                                 className="flex flex-col gap-2"
-                                onSubmit={(e) => fetchLogin(e, { setAuth, router, setLoginMessage, refreshAuth, from })}
+                                onSubmit={(e) => fetchLogin(e, { setAuth, router, setLoginMessage, refreshAuth })}
                                 validationBehavior="native"
                             >
                                 <Input
