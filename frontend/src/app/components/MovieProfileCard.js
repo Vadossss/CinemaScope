@@ -18,6 +18,7 @@ export default function App({ setUpdate, data, dataCategory }) {
     const { userId } = useAuth();
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [categoryName, setCategoryName] = useState("");
+    const [imgLoaded, setImgLoaded] = useState(false);
 
     console.log(dataCategory);
 
@@ -101,10 +102,15 @@ export default function App({ setUpdate, data, dataCategory }) {
                 <div className="relative">
                     <div
                         className="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover/item:opacity-100 transition-opacity rounded"></div>
+                    {!imgLoaded && (
+                        <div className="relative overflow-hidden rounded h-[225px] w-full bg-gray-300">
+                            <div className="absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-100 to-gray-300 animate-[shimmer_2s_infinite]" />
+                        </div>
+                    )}
                     {data?.poster?.previewUrl !== null && data?.poster?.previewUrl ? (
-                        <img className="object-fit h-[225px] rounded" src={data.poster.previewUrl} alt="Постер"/>
+                        <img className="object-fit h-[225px] rounded" src={data.poster.previewUrl} alt="Постер" onLoad={() => setImgLoaded(true)}/>
                     ) : (
-                        <img className="object-contain h-[225px] rounded" src="icon_movie.svg" alt="Постер"/>
+                        <img className="object-contain h-[225px] rounded" src="icon_movie.svg" alt="Постер" onLoad={() => setImgLoaded(true)}/>
                     )}
                 </div>
 
