@@ -1,4 +1,4 @@
-export async function fetchLogin(event, { setAuth, router, setLoginMessage, refreshAuth, from }) {
+export async function fetchLogin(event, { setAuth, router, setLoginMessage, refreshAuth }) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const data = Object.fromEntries(formData);
@@ -25,7 +25,7 @@ export async function fetchLogin(event, { setAuth, router, setLoginMessage, refr
 
         if (res.status === 200) {
             await refreshAuth();
-            router.push(from || "/");
+            router.push("/");
             setAuth(true);
         } else {
             setLoginMessage(
