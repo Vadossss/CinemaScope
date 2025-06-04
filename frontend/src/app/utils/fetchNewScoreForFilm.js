@@ -13,9 +13,8 @@ export async function fetchNewCommentForFilm(body) {
             body: JSON.stringify(body)
         });
 
-        console.log(res.json());
-        if (res === false) {
-            // return true;
+        if (res.ok) {
+            return await res.json();
         }
 
     } catch (error) {
