@@ -7,6 +7,7 @@ import PersonHeader from "./PersonHeader";
 import PersonBody from "./PersonBody";
 import PersonMovieList from "./PersonMovieList";
 import { fetchGetPersonByID } from "../utils/fetchGetPersonByID";
+import {Spinner} from "@heroui/react";
 
 export default function PersonPage() {
   const params = useParams();
@@ -40,12 +41,15 @@ export default function PersonPage() {
     fetchPerson();
   }, [id]);
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+        <div className="min-h-screen w-full max-w-[1600px] rounded-xl flex justify-center items-center bg-gray-50 px-4">
+          <div className=" p-8">
+            <Spinner color="warning"/>
+          </div>
+        </div>
+    )
+  }
 
   if (error)
     return (
@@ -63,8 +67,8 @@ export default function PersonPage() {
     );
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4 w-[1600px]">
-      <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-6 space-y-8">
+    <div className="min-h-screen bg-white rounded-xl py-8 px-4 w-[1600px]">
+      <div className="max-w-6xl mx-auto  p-6 space-y-8">
         {/* Заголовок и фото */}
         <PersonHeader person={person} />
 
