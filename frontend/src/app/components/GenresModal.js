@@ -50,7 +50,7 @@ const genres = [
     { name: "церемония", slug: "ceremoniya" }
 ];
 
-export default function App({showGenreModal}) {
+export default function App({showGenreModal, isUseButton}) {
     const [isOpen, setIsOpen] = useState(false);
     const [genresArray, setGenresArray] = useState([]);
     const { setHasChosenGenres, setLastDismissed } = useAuth();
@@ -85,6 +85,9 @@ export default function App({showGenreModal}) {
 
     return (
         <>
+            {isUseButton && (
+                <Button className="hover:bg-orange-600 bg-orange-500 text-white transition ease-in delay-50" onPress={() => setIsOpen(!isOpen)}>Выбрать любимые жанры</Button>
+            )}
             <Modal
                 backdrop="opaque"
                 classNames={{
