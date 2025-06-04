@@ -6,10 +6,10 @@ import {useAuth} from "@/app/contexts/authContext";
 import {useEffect, useState} from "react";
 
 export default function App({ data }) {
-    const { categories, auth } = useAuth();
+    const { categories, auth, setCategories } = useAuth();
     const [isAddToLists, setIsAddToLists] = useState(false);
+    const [imgLoaded, setImgLoaded] = useState(false);
 
-    // console.log(data.id);
 
     useEffect(() => {
         if (auth !== false && auth !== null) {
@@ -22,8 +22,6 @@ export default function App({ data }) {
 
     const ratingColor = data.rating.kp > 7.1 ? "#3bb33b" : data.rating.kp > 4.1 ? "#777" : "#ff1414";
 
-    // console.log(isAddToLists);
-
     return (
         <div className="w-[150px] group/item">
             {!isAddToLists && auth && (
@@ -35,6 +33,18 @@ export default function App({ data }) {
                         onClick={(e) => {
                             fetchAddWishlist(data.id, "planned");
                             setIsAddToLists(true);
+                            const updatedCategories = {...categories};
+
+                            for (const key of Object.keys(updatedCategories)) {
+                                updatedCategories[key] = updatedCategories[key].filter(id => id !== String(data.id));
+                            }
+
+                            updatedCategories["planned"] = [
+                                ...updatedCategories["planned"],
+                                String(data.id),
+                            ];
+
+                            setCategories(updatedCategories);
                         }}
                         title="Буду смотреть">
                         <img className="-scale-100" src="/icon_add.svg"></img>
@@ -43,13 +53,28 @@ export default function App({ data }) {
             )}
 
             <Link href={data.isSeries ? `/series/${data.id}` : `/films/${data.id}`}>
-                <div className="relative">
+                <div className="relative h-[225px]">
                     <div
                         className="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover/item:opacity-100 transition-opacity rounded"></div>
+                    {!imgLoaded && (
+                        <div className="relative overflow-hidden rounded w-full h-full bg-gray-300">
+                            <div className="absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-100 to-gray-300 animate-[shimmer_2s_infinite]" />
+                        </div>
+                    )}
                     {data?.poster?.previewUrl !== null && data?.poster?.previewUrl ? (
-                        <img className="object-fit h-[225px] rounded" src={data.poster.previewUrl} alt="Постер"/>
+                        <img
+                            className={`w-full h-full object-fit rounded transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+                            src={data.poster.previewUrl}
+                            alt="Постер"
+                            onLoad={() => setImgLoaded(true)}
+                        />
                     ) : (
-                        <img className="object-contain h-[225px] rounded" src="/icon_movie.svg" alt="Постер"/>
+                        <img
+                            className="w-full h-full object-contain rounded"
+                            src="/icon_movie.svg"
+                            alt="Постер"
+                            onLoad={() => setImgLoaded(true)}
+                        />
                     )}
                 </div>
 
