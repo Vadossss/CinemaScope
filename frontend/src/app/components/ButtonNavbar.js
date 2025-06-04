@@ -35,7 +35,7 @@ const items = [
 ];
 
 export default function App() {
-    const { auth, username, userId, avatar, setAuth } = useAuth();
+    const { auth, username, userId, avatar, setAuth, role } = useAuth();
     const [isLoading, setLoading] = useState(true);
     const router  = useRouter();
 
@@ -95,6 +95,11 @@ export default function App() {
                             name={`${username}`}
                         />
                     </DropdownItem>
+                    {role === "ROLE_ADMIN" && (
+                        <DropdownItem  href="/admins">
+                            Admin
+                        </DropdownItem>
+                        )}
                     {items.map((item) => (
                         <DropdownItem
                             key={item.key}
@@ -107,8 +112,10 @@ export default function App() {
                             </Link>
                         </DropdownItem>
                     ))}
+                    
                 </DropdownMenu>
             </Dropdown>)}
+            
         </>
     );
 }
