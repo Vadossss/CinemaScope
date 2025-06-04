@@ -17,6 +17,7 @@ export default function App() {
         const fetchData = async () => {
             try {
                 const [result, isLoading] = await fetchGetMovieById(filmId);
+                console.log(filmId);
                 setData(result.persons);
             } catch (error) {
 
@@ -25,9 +26,19 @@ export default function App() {
             }
         }
         fetchData();
-    }, [])
+    }, [filmId])
 
-    const groupedCast = data.reduce((acc, person) => {
+    if (isLoading) {
+        return (
+            <div className="min-h-screen w-full max-w-[1504px] rounded-xl flex justify-center items-center bg-gray-50 px-4">
+                <div className=" p-8">
+                    <Spinner color="warning"/>
+                </div>
+            </div>
+        )
+    }
+
+    const groupedCast = (data || []).reduce((acc, person) => {
         const profession = person.profession || 'Неизвестно';
         if (!acc[profession]) acc[profession] = [];
         acc[profession].push(person);
@@ -46,13 +57,6 @@ export default function App() {
             person.enName?.toLowerCase().includes(searchTerm.toLowerCase()))
     ) || [];
 
-    if (isLoading) {
-        return (
-            <div className="w-[1600px] h-screen bg-white flex justify-center rounded-xl items-center">
-                <Spinner color="warning" />
-            </div>
-        )
-    }
 
     return (
         <div className="lg:w-[1504px] min-h-screen bg-gray-50 rounded-xl">
@@ -140,7 +144,7 @@ function PersonCard({ person }) {
         <div className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-100">
             <div className="aspect-square relative overflow-hidden">
                 <img
-                    src={person.photo || 'https://placehold.co/360x360?text=No+Image '}
+                    src={person.photo || '/base_poster.svg'}
                     alt={person.name}
                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                 />
