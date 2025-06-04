@@ -32,7 +32,7 @@ export default function App() {
 
     if (isLoading) {
         return (
-            <div className="w-[1600px] h-screen bg-white flex justify-center rounded-xl items-center">
+            <div className="w-[1504px] h-screen bg-white flex justify-center rounded-xl items-center">
                 <Spinner color="warning" />
             </div>
         )
@@ -40,34 +40,38 @@ export default function App() {
     console.log(filmData)
 
     return (
-        <div className="w-[1504px] flex bg-white pt-5 pb-5 rounded-xl justify-center">
-            <main>
-                <div className="flex flex-col w-[1280px]">
-                    <div className="flex mr-16 ml-16 gap-10">
-                        <div className="flex flex-col gap-4">
-                            <div>
-                                <img className="w-[400px] rounded" src={filmData.poster.url}></img>
-                            </div>
-                            <div>
-                                {filmData.trailer && (
-                                    <div>
-                                        <iframe
-                                            className="rounded w-[315px] h-[200px]"
-                                            src={filmData.trailer}
+        <div className="max-w-[1504px] 2xl:w-[1504px] rounded-xl bg-white min-h-screen sm:px-6 lg:px-8 py-2">
+            <main className=" mx-auto rounded-lg p-8">
+                <div className="flex flex-col lg:flex-row gap-10 mb-10">
 
-                                            title="YouTube video player" frameBorder="0"
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; web-share"
-                                            referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="flex flex-col w-[840px]">
-                            <MovieHeader filmData={filmData}/>
-                            <MovieBody filmData={filmData}/>
-                        </div>
+                    <div className="flex flex-col gap-6 w-full lg:w-1/3">
+                        <img
+                            className="w-full h-auto rounded-lg shadow-md"
+                            src={filmData.poster.url}
+                            alt="Постер фильма"
+                        />
 
+                        {filmData.trailer && (
+                            <div className="w-full aspect-video rounded-lg overflow-hidden shadow-md">
+                                <iframe
+                                    className="w-full h-full"
+                                    src={filmData.trailer}
+                                    title="YouTube video player"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                ></iframe>
+                            </div>
+                        )}
                     </div>
+
+                    <div className="w-full lg:w-2/3 flex flex-col gap-6">
+                        <MovieHeader filmData={filmData}/>
+                        <MovieBody filmData={filmData} description={"О сериале"}/>
+                    </div>
+                </div>
+
+                <div className="mt-10">
                     <Comments id={filmData.id}/>
                 </div>
             </main>
