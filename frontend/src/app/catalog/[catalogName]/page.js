@@ -5,6 +5,7 @@ import { fetchMovies } from "../../utils/fetchMovies";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import MovieCard from "../../components/MovieCard";
+import {Spinner} from "@heroui/react";
 
 export default function CatalogPage() {
   const [objects, setObjects] = useState([]);
@@ -74,19 +75,20 @@ useEffect(() => {
   return totalPagesArr;
 };
 
+  if (loading) {
+    return (
+        <div className="min-h-screen w-full max-w-[1600px] rounded-xl flex justify-center items-center bg-gray-50 px-4">
+          <div className=" p-8">
+            <Spinner color="warning"/>
+          </div>
+        </div>
+    )
+  }
+
 
   return (
-    <div className="p-4 md:p-8 bg-gray-50 min-h-screen w-[1600px]">
+    <div className="p-4 md:p-8 bg-gray-50 rounded-xl min-h-screen w-[1600px]">
       <h1 className="text-3xl font-bold text-black 600 mb-6 text-center">Каталог</h1>
-
-      {/* Лоадер */}
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      ) : (
-        <>
-          {/* Сетка актёров */}
       
      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-9 gap-2">
       {pagedObjects.map((object) => (
@@ -165,8 +167,6 @@ useEffect(() => {
               />
             </button>
           </div>
-        </>
-      )}
     </div>
   );
 }
