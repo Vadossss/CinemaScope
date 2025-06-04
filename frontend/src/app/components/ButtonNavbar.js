@@ -41,11 +41,6 @@ export default function App() {
         router.push("/")
         setAuth(false);
         await fetch('http://localhost:8085/auth/logout', { method: 'POST', credentials: "include" });
-        // return (
-        //     <div className="w-[1600px] h-screen bg-white flex justify-center rounded-xl items-center">
-        //         <Spinner color="warning" />
-        //     </div>
-        // )
     };
 
     if (isLoading) {
@@ -89,7 +84,7 @@ export default function App() {
                     </DropdownItem>
                     {role === "ROLE_ADMIN" && (
                         <DropdownItem  href="/admins">
-                            Admin
+                            Панель администратора
                         </DropdownItem>
                         )}
                     {items.map((item) => (
