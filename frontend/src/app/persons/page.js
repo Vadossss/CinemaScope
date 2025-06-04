@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getPersons } from "@/app/utils/fetchAllPersons";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import {Spinner} from "@heroui/react";
 
 export default function PersonsPage() {
   const [persons, setPersons] = useState([]);
@@ -79,16 +80,19 @@ export default function PersonsPage() {
     return url.replace("https:https://","https://");
   };
 
-  return (
-    <div className="p-4 md:p-8 bg-gray-50 min-h-screen w-[1600px]">
-      <h1 className="text-3xl font-bold text-black 600 mb-6 text-center">Персоны</h1>
-
-      {/* Лоадер */}
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+  if (loading) {
+    return (
+        <div className="min-h-screen w-full max-w-[1600px] rounded-xl flex justify-center items-center bg-gray-50 px-4">
+          <div className=" p-8">
+            <Spinner color="warning"/>
+          </div>
         </div>
-      ) : (
+    )
+  }
+
+  return (
+    <div className="p-4 md:p-8 bg-gray-50 rounded-xl min-h-screen w-[1600px]">
+      <h1 className="text-3xl font-bold text-black 600 mb-6 text-center">Персоны</h1>
         <>
           {/* Сетка актёров */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
@@ -164,7 +168,6 @@ export default function PersonsPage() {
             </button>
           </div>
         </>
-      )}
     </div>
   );
 }
