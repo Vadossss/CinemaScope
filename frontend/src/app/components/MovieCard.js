@@ -37,7 +37,7 @@ export default function App({ data }) {
                             setIsAddToLists(true);
                         }}
                         title="Буду смотреть">
-                        <img className="-scale-100" src="icon_add.svg"></img>
+                        <img className="-scale-100" src="/icon_add.svg"></img>
                     </button>
                 </div>
             )}
@@ -49,7 +49,7 @@ export default function App({ data }) {
                     {data?.poster?.previewUrl !== null && data?.poster?.previewUrl ? (
                         <img className="object-fit h-[225px] rounded" src={data.poster.previewUrl} alt="Постер"/>
                     ) : (
-                        <img className="object-contain h-[225px] rounded" src="icon_movie.svg" alt="Постер"/>
+                        <img className="object-contain h-[225px] rounded" src="/icon_movie.svg" alt="Постер"/>
                     )}
                 </div>
 
