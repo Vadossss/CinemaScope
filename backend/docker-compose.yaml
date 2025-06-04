@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: movieDB
+      POSTGRES_USER: ${DATA_BASE_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DATA_BASE_PASSWORD:-35798521}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+      - C:/filmsDB:/dump
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017 --quiet
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    depends_on:
+      - postgres
+      - mongo
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/movieDB
+      SPRING_DATASOURCE_USERNAME: ${DATA_BASE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DATA_BASE_PASSWORD}
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/filmsDB
+      SERVER_PORT: 8085
+      SECRET_KINO_API_KEY2: ${SECRET_KINO_API_KEY2}
+      NEWS_API_KEY: ${NEWS_API_KEY}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+    volumes:
+      - D:/UserImages/avatars:/app/uploads
+    restart: on-failure
+
+volumes:
+  pgdata:
+  mongodata:
