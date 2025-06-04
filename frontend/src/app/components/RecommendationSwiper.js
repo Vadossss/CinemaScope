@@ -6,7 +6,7 @@ export default function App({movieData}) {
         <>
             {movieData && (
                 <div className="flex flex-col gap-2 w-[1504px]">
-                <span className="font-bold">Рекомендации</span>
+                <span className="font-bold text-xl">Рекомендации</span>
                 <ScrollMovie data={movieData}/>
             </div>) }
         </>
