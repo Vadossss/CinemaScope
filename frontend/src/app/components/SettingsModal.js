@@ -72,15 +72,6 @@ export default function App() {
         } finally {
             setUploading(false);
         }
-
-        // if (username !== usernameLabel && usernameLabel.length > 4) {
-        //     const fetch = async () => {
-        //         await fetchUpdateUsername(usernameLabel);
-        //     }
-        //     await fetch();
-        // }
-
-
     };
 
     return (
