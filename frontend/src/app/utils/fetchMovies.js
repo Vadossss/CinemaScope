@@ -1,27 +1,27 @@
-const raw = JSON.stringify({
-    limit: 100,
+export async function fetchMovies(type, limit=100) {
+    const raw = JSON.stringify({
     types: [
-        "movie"
+        type
     ]
 });
-
-export async function fetchMovies() {
     try {
+        
+        
         const res = await fetch("http://localhost:8085/films/movie", {
             method: "POST",
-            body: raw,
-            redirect: "follow",
+            body: JSON.stringify({
+                types: [type],
+            }),
             credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
+             headers: { "Content-Type": "application/json" },
         });
 
-        if (res.ok) {
+        if (res.ok) { 
             return [await res.json(), false];
         }
         else {
             console.log("Ошибка");
+            
             return [null, false]
         }
     } catch (error) {
